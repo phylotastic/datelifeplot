@@ -7,6 +7,8 @@
 subset_trees(trees, include = TRUE)
 }
 \arguments{
+\item{trees}{A list of trees as multiPhylo or as a plain list object.}
+
 \item{include}{Boolean or numeric vector. Default to TRUE, keep all chronograms
 in trees. If FALSE, exclude chronograms with only two tips. If numeric, it is used
 as indices to subset trees object.}

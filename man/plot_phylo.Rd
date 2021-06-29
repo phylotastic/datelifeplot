@@ -17,6 +17,8 @@ plot_phylo(
 )
 }
 \arguments{
+\item{tree}{A tree either as a newick character string or as a phylo object}
+
 \item{title}{A character string giving the name and path to write the files to.}
 
 \item{time_depth}{A numeric vector indicating the upper limit on the time x axis scale.}

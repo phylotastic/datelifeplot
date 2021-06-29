@@ -14,6 +14,8 @@ plot_phylo_all(
 )
 }
 \arguments{
+\item{trees}{A list of trees as multiPhylo or as a plain list object.}
+
 \item{cex}{a numeric value giving the factor scaling of the tip and
     node labels (Character EXpansion). The default is to take the
     current value from the graphical parameters.}

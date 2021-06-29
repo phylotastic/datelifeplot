@@ -534,7 +534,7 @@
 "strat2012"
 
 #' subset trees for plotting densitree plots and phylo_all plots
-#' @inheritParams get_biggest_phylo
+#' @param trees A list of trees as multiPhylo or as a plain list object.
 #' @param include Boolean or numeric vector. Default to TRUE, keep all chronograms
 #' in trees. If FALSE, exclude chronograms with only two tips. If numeric, it is used
 #' as indices to subset trees object.
@@ -556,7 +556,7 @@ subset_trees <- function(trees, include = TRUE){
 #' get a densiTree plot from a set of opentree_chronograms
 #' if densiTree plot function throws an error, it chooses the tree with the most tips as consensus (using get_biggest_phylo)
 #' we found that densiTree errors commonly from failing to do a consensus tree.
-#' @inheritParams get_biggest_phylo
+#' @param trees A list of trees as multiPhylo or as a plain list object.
 #' @inheritParams subset_trees
 #' @inheritDotParams phangorn::densiTree -x -consensus
 #' @export
@@ -574,11 +574,11 @@ plot_densitree <- function(trees, include = TRUE, ...){
   # })
   class(trees) <- "multiPhylo"
   # if we use biggest phylo as consensus for all, some data set are not plotted correctly
-  # biggest_phylo <- get_biggest_phylo(trees = trees)
+  # biggest_phylo <- datelife::get_biggest_phylo(trees = trees)
   # try(phangorn::densiTree(x = trees, consensus = biggest_phylo, ...))
   tryCatch(phangorn::densiTree(x = trees, ...),
   error = function(e) {
-    biggest_phylo <- get_biggest_phylo(trees = trees)
+    biggest_phylo <- datelife::get_biggest_phylo(trees = trees)
     try(phangorn::densiTree(x = trees, consensus = biggest_phylo, ...))
   })
 }
@@ -673,7 +673,7 @@ wrap_string_to_plot <- function(string, max_cex = 1, min_cex = 0.5, string_font 
 
 #' plot all trees with study titles and geochronological axis
 #'
-#' @inheritParams get_biggest_phylo
+#' @param trees A list of trees as multiPhylo or as a plain list object.
 #' @inheritParams subset_trees
 #' @inheritParams plot_phylo
 #' @param individually Boolean indicating if trees should be plotted one by one or all on the same file
@@ -725,8 +725,7 @@ plot_phylo_all <- function(trees, cex = graphics::par("cex"), include = TRUE, in
 }
 #' plot one tree with study title and geochronological axis
 #'
-#' @inheritParams get_biggest_phylo
-#' @inheritParams tree_fix_brlen
+#' @param tree A tree either as a newick character string or as a phylo object
 #' @param title A character string giving the name and path to write the files to.
 #' @param time_depth A numeric vector indicating the upper limit on the time x axis scale.
 #' @param axis_type A numeric vector indicating the type of geochronological axis to plot. See examples.
@@ -737,8 +736,15 @@ plot_phylo_all <- function(trees, cex = graphics::par("cex"), include = TRUE, in
 #' @param GTS A dataframe of geochronological limits.
 #' @export
 # enhance: examples of axis_types!
-plot_phylo <- function(tree, title = "Tree", time_depth = NULL, axis_type = 1,
-cex = graphics::par("cex"), mai4 = NULL, write = "nothing", file_name = NULL, GTS = utils::getAnywhere("strat2012")){
+plot_phylo <- function(tree,
+                       title = "Tree",
+                       time_depth = NULL,
+                       axis_type = 1,
+                       cex = graphics::par("cex"),
+                       mai4 = NULL,
+                       write = "nothing",
+                       file_name = NULL,
+                       GTS = utils::getAnywhere("strat2012")){
   if(is.null(GTS)){
     # utils::data(strat2012)
     GTS <- utils::getAnywhere("strat2012")
