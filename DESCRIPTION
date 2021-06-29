@@ -1,0 +1,13 @@
+Package: datelifeplot
+Type: Package
+Title: Plotting methods for the \code{datelife} package
+Version: 0.1.0
+Author: c(person("Luna L.", "Sanchez-Reyes", role=c("aut", "cre"), email="lunalsr@gmail.com"),
+Maintainer: "Luna L. Sanchez-Reyes" <lunalsr@gmail.com>
+Description: Generate plots for visualizing results from the DateLife package.
+    Plot chronograms using the citations as title, overlap chronograms, overlap LTT plots, and more.
+License: GPL (>=2)
+Encoding: UTF-8
+LazyData: true
+VignetteBuilder: knitr
+URL: https://github.com/phylotastic/datelifeplot
