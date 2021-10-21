@@ -1,4 +1,4 @@
-# `datelifeplot`
+# Welcome to `datelifeplot`'s GitHub repository!
 
 ## Plotting methods for the `datelife` package.
 
