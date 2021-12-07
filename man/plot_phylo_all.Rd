@@ -16,9 +16,7 @@ plot_phylo_all(
 \arguments{
 \item{trees}{A list of trees as multiPhylo or as a plain list object.}
 
-\item{cex}{a numeric value giving the factor scaling of the tip and
-    node labels (Character EXpansion). The default is to take the
-    current value from the graphical parameters.}
+\item{cex}{a real number giving the \bold{c}haracter \bold{ex}pansion.}
 
 \item{include}{Boolean or numeric vector. Default to TRUE, keep all chronograms
 in trees. If FALSE, exclude chronograms with only two tips. If numeric, it is used
@@ -26,7 +24,8 @@ as indices to subset trees object.}
 
 \item{individually}{Boolean indicating if trees should be plotted one by one or all on the same file}
 
-\item{write}{A character vector of length 1. Use pdf or png to write a file on those formats respectively. Anything else will not write any image file.}
+\item{write}{A character vector of length 1. Use pdf or png to write a file
+on those formats respectively. Anything else will not write any file.}
 
 \item{file}{A character string giving the name and path to write the files to.}
 }

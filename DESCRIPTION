@@ -1,7 +1,7 @@
 Package: datelifeplot
 Type: Package
-Title: Plotting methods for the \code{datelife} package
-Version: 0.1.0
+Title: Plotting methods for the \code{datelife} R package
+Version: 0.2.0
 Author: c(person("Luna L.", "Sanchez-Reyes", role=c("aut", "cre"), email="lunalsr@gmail.com"),
 Maintainer: "Luna L. Sanchez-Reyes" <lunalsr@gmail.com>
 Description: Generate plots for visualizing results from the DateLife package.
@@ -12,11 +12,12 @@ LazyData: true
 VignetteBuilder: knitr
 URL: https://github.com/phylotastic/datelifeplot
 Imports:
-  ape,
-  datelife,
-  phangorn,
-  phytools,
-  strap
+    ape,
+    datelife,
+    phangorn,
+    phyloch (>= 1.5.5),
+    phytools,
+    strap
 Suggests:
     knitr,
     testthat (>= 3.0.0)
@@ -24,3 +25,5 @@ Config/testthat/edition: 3
 RoxygenNote: 7.1.2
 Depends:
     R (>= 2.10)
+Remotes:  
+    fmichonneau/phyloch

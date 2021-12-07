@@ -2,50 +2,54 @@
 % Please edit documentation in R/plots.R
 \name{plot_phylo}
 \alias{plot_phylo}
-\title{Plot a single tree with a title and a geochronological axis}
+\title{Plot a single chronogram with a title and a geochronological axis}
 \usage{
 plot_phylo(
   tree,
   title = "Tree",
   time_depth = NULL,
-  axis_type = 1,
+  plot_type = "phyloch",
   cex = graphics::par("cex"),
   mai4 = NULL,
   write = "nothing",
   file_name = NULL,
-  geologic_timescale = "strat2012"
+  geologic_timescale = "strat2012",
+  unit = "period"
 )
 }
 \arguments{
-\item{tree}{A tree either as a newick character string or as a `phylo` object.}
+\item{tree}{A chronogram either as a newick character string or as a `phylo` object.}
 
 \item{title}{A character string providing the title for the plot.}
 
-\item{time_depth}{A numeric vector indicating the upper limit on the x axis time scale.}
+\item{time_depth}{A numeric vector indicating the upper limit for the time scale on the x axis.}
 
-\item{axis_type}{A numeric or character vector of length one indicating the type of geochronological
-axis to plot. Options are:
+\item{plot_type}{A character vector of length one indicating the type of
+plot to generate. Options are:
 \describe{
-    \item{1}{It uses the function [phyloch::axisGeo()] from the package [phyloch], with `"period"` as `units`.}
-    \item{2}{It also uses the function [phyloch::axisGeo()] from the package [phyloch], with `c("period", "epoch"` as `units`.}
-    \item{3}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
+    \item{"phyloch"}{It uses the functions [ape::plot.phylo()] and [phyloch::axisGeo()].}
+    \item{"strap"}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
+    \item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
     }}
 
-\item{cex}{a numeric value giving the factor scaling of the tip and
-    node labels (Character EXpansion). The default is to take the
-    current value from the graphical parameters.}
+\item{cex}{a real number giving the \bold{c}haracter \bold{ex}pansion.}
 
-\item{mai4}{A numeric vector of length one indicating the space needed for plotting whole tip labels (right margin of the plot).}
+\item{mai4}{A numeric vector of length one indicating the space needed for
+plotting whole tip labels (right margin of the plot).}
 
-\item{write}{A character vector of length 1. Use pdf or png to write a file on those formats respectively. Anything else will not write any image file.}
+\item{write}{A character vector of length 1. Use pdf or png to write a file
+on those formats respectively. Anything else will not write any file.}
 
 \item{file_name}{A character string giving the name and path to write the files to.}
 
 \item{geologic_timescale}{A dataframe of geochronological limits.}
+
+\item{unit}{a vector of mode character used to select geological time units that shall be displayed. When using \code{gradstein04}, \code{"eon"}, \code{"era"}, \code{"period"}, \code{"epoch"}, and \code{"stage"} are available.}
 }
 \description{
-Plot a single tree with a title and a geochronological axis
+Plot a single chronogram with a title and a geochronological axis
 }
 \details{
-[plot_phylo()] uses the [ape::plot.phylo()] function from the package ape.
+[plot_phylo()] uses different plotting functions to generate a plot
+of a given tree with a time axis representing geologic time.
 }

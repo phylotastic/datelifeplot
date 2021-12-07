@@ -710,7 +710,7 @@ plot_phylo_all <- function(trees, cex = graphics::par("cex"), include = TRUE, in
   }
   for (i in 1:length(trees)){
     file_name <- paste0(gsub("\\.png$|\\.pdf$", "", file), "/", gsub("\\.png$|\\.pdf$", "", file), "_", i, ".", write)
-    plot_phylo(trees[[i]], names(trees)[i], time_depth = max.depth, axis_type = 1, cex, mai4, write, file_name, GTS = NULL)
+    plot_phylo(trees[[i]], names(trees)[i], time_depth = max.depth, plot_type = 1, cex, mai4, write, file_name, geologic_timescale = NULL)
   }
   # getting an "unrecoverable" error with merge PDF:
   # if(!individually){
@@ -723,24 +723,27 @@ plot_phylo_all <- function(trees, cex = graphics::par("cex"), include = TRUE, in
   #   )
   # }
 }
-#' Plot a single tree with a title and a geochronological axis
+#' Plot a single chronogram with a title and a geochronological axis
 #'
-#' @details [plot_phylo()] uses the [ape::plot.phylo()] function from the package ape.
+#' @details [plot_phylo()] uses different plotting functions to generate a plot
+#' of a given tree with a time axis representing geologic time.
 #'
-#' @param tree A tree either as a newick character string or as a `phylo` object.
+#' @param tree A chronogram either as a newick character string or as a `phylo` object.
 #' @param title A character string providing the title for the plot.
-#' @param time_depth A numeric vector indicating the upper limit on the x axis time scale.
-#' @param axis_type A numeric or character vector of length one indicating the type of geochronological
-#' axis to plot. Options are:
+#' @param time_depth A numeric vector indicating the upper limit for the time scale on the x axis.
+#' @param plot_type A character vector of length one indicating the type of
+#' plot to generate. Options are:
 #' \describe{
-#' 	\item{1}{It uses the function [phyloch::axisGeo()] from the package [phyloch], with `"period"` as `units`.}
-#' 	\item{2}{It also uses the function [phyloch::axisGeo()] from the package [phyloch], with `c("period", "epoch"` as `units`.}
-#' 	\item{3}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
+#' 	\item{"phyloch"}{It uses the functions [ape::plot.phylo()] and [phyloch::axisGeo()].}
+#' 	\item{"strap"}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
+#' 	\item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
 #' 	}
 
-#' @param mai4 A numeric vector of length one indicating the space needed for plotting whole tip labels (right margin of the plot).
-#' @param write A character vector of length 1. Use pdf or png to write a file on those formats respectively. Anything else will not write any image file.
-#' @inheritParams ape::plot.phylo
+#' @param mai4 A numeric vector of length one indicating the space needed for
+#'   plotting whole tip labels (right margin of the plot).
+#' @param write A character vector of length 1. Use pdf or png to write a file
+#'   on those formats respectively. Anything else will not write any file.
+#' @inheritParams phyloch::axisGeo
 #' @param file_name A character string giving the name and path to write the files to.
 #' @param geologic_timescale A dataframe of geochronological limits.
 #' @export
@@ -748,26 +751,33 @@ plot_phylo_all <- function(trees, cex = graphics::par("cex"), include = TRUE, in
 plot_phylo <- function(tree,
                        title = "Tree",
                        time_depth = NULL,
-                       axis_type = 1,
+                       plot_type = "phyloch",
                        cex = graphics::par("cex"),
                        mai4 = NULL,
                        write = "nothing",
                        file_name = NULL,
-                       geologic_timescale = "strat2012"){
+                       geologic_timescale = "strat2012",
+                       unit = "period"){
+  #
+  if (is.null(tree$edge.length)) {
+    message("Tree has no edge lengths; a tree with a geologic time axis can not be plotted.")
+    return(NA)
+  }
+  phylo_length <- max(ape::branching.times(tree))
+  if(is.null(time_depth)){
+    if(is.null(tree$root.edge)){
+      time_depth <- round(phylo_length*1.2, digits = -1)
+    } else {
+      time_depth <- round(phylo_length + tree$root.edge, digits = -1)
+    }
+  }
+  match.arg(arg = plot_type, choices = c("phyloch", "strap", "phytools"))
   if(is.null(geologic_timescale)){
     geologic_timescale <- "strat2012"
   }
   if ("strat2012" %in% geologic_timescale) {
     utils::data("strat2012", package = "phyloch")
     geologic_timescale <- strat2012
-  }
-  phylo_length <- max(ape::branching.times(tree))
-  if(is.null(time_depth) & !is.null(tree$edge.length)){
-    if(is.null(tree$root.edge)){
-      time_depth <- round(phylo_length*1.2, digits = -1)
-    } else {
-      time_depth <- round(phylo_length + tree$root.edge, digits = -1)
-    }
   }
   if(is.null(mai4)){
     ind <- which.max(nchar(tree$tip.label))
@@ -783,53 +793,43 @@ plot_phylo <- function(tree,
   graphics::par(xpd = NA, mai = c(0, 0, 0, mai4), omi = c(pho$omi1, 0, 1, 0))
   # plot_chronogram.phylo(trees[[i]], cex = 1.5, edge.width = 2, label.offset = 0.5,
     # x.lim = c(0, max.depth), root.edge = TRUE, root.edge.color = "white")
-  if (is.null(tree$edge.length)) {
-      ape::plot.phylo(tree,
-                      cex = cex, #edge.width = 2,
-                      label.offset = 0.5,
-                      plot = TRUE)  #, ...
-  } else {
-      ape::plot.phylo(tree, cex = cex, #edge.width = 2,
-        label.offset = 0.5, x.lim = c(0, time_depth), root.edge = TRUE, plot = TRUE)  #, ...
-  }
   graphics::par(xpd = FALSE)
-  if (!is.null(tree$edge.length)) {
-    axis_type <- as.numeric(axis_type)
-    if(axis_type == 1){
-      axisGeo(GTS = geologic_timescale,
-              unit = c("period"),
-              col = c("gray80", "white"),
-              gridcol = c("gray80", "white"),
-              cex = 0.5,
-              gridty = "twodash")
-    }
-    if(axis_type == 2){
-      axisGeo(GTS = geologic_timescale,
-              unit = c("period","epoch"),
-              col = c("gray80", "white"),
-              gridcol = c("gray80", "white"),
-              cex = 0.5,
-              gridty = "twodash")
-    }
-    if(axis_type == 3){
-      tree$root.time <- tree_depth
-      strap::geoscalePhylo(tree = tree,
-                           # ages=tree$ranges.used,
-                           cex.tip = 0.7,
-                           cex.ts = 0.7,
-                           cex.age = 0.7,
-                           width = 4,
-                           tick.scale = 15,
-                           boxes = "Epoch",
-                           erotate = 90,
-                           quat.rm = TRUE,
-                           units = c("Period","Epoch"))
-    }
-    graphics::mtext("Time (MYA)", cex = cex, side = 1, font = 2, line = (pho$omi1-0.2)/0.2,
-    outer = TRUE, at = 0.4)
-  } else (
-      message("Tree has no edge.length; a geologic time axis can not be plotted.")
-  )
+  if("phyloch" %in% plot_type){
+    ape::plot.phylo(tree,
+                    cex = cex, #edge.width = 2,
+                    label.offset = 0.5,
+                    x.lim = c(0, time_depth),
+                    root.edge = TRUE,
+                    plot = TRUE)  #, ...
+    axisGeo(GTS = geologic_timescale,
+            unit = unit,
+            col = c("gray80", "white"),
+            gridcol = c("gray80", "white"),
+            cex = 0.5,
+            gridty = "twodash")
+  }
+  if("phytools" %in% plot_type){
+    # TODO
+    message("Plotting a geologic time axis with phytools is not supported yet.")
+  }
+  if("strap" %in% plot_type){
+    tree$root.time <- time_depth
+    strap::geoscalePhylo(tree = tree,
+                         x.lim = c(0, time_depth),
+                         cex.tip = 0.7,
+                         cex.ts = 0.7,
+                         cex.age = 0.7,
+                         width = 4,
+                         tick.scale = 15,
+    # creates boxes with the last unit in argument "unit":
+                         boxes = unit[length(unit)],
+                         erotate = 90,
+                         quat.rm = TRUE,
+                         units = unit)
+  }
+  graphics::mtext("Time (MYA)", cex = cex, side = 1, font = 2, line = (pho$omi1-0.2)/0.2,
+  outer = TRUE, at = 0.4)
+
   if(!is.null(title)){
     titlei <- wrap_string_to_plot(string = title, max_cex = 1, whole = FALSE)
     graphics::mtext(text = titlei$wrapped, outer = TRUE,
@@ -840,7 +840,7 @@ plot_phylo <- function(tree,
   }
 }
 # tree <- plant_bold_otol_tree
-# plot_phylo_gg <- function(tree, title = "Tree", time_depth = NULL, axis_type = 1,
+# plot_phylo_gg <- function(tree, title = "Tree", time_depth = NULL, plot_type = 1,
 # cex = graphics::par("cex"), mai4 = NULL, write = "nothing", file_name = NULL, GTS = utils::getAnywhere("strat2012")){
 #   max_age <- max(ape::branching.times(tree))
 #   age_lim <- max_age*1.2
