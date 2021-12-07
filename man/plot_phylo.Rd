@@ -13,7 +13,7 @@ plot_phylo(
   mai4 = NULL,
   write = "nothing",
   file_name = NULL,
-  GTS = "strat2012"
+  geologic_timescale = "strat2012"
 )
 }
 \arguments{
@@ -41,7 +41,7 @@ axis to plot. Options are:
 
 \item{file_name}{A character string giving the name and path to write the files to.}
 
-\item{GTS}{A dataframe of geochronological limits.}
+\item{geologic_timescale}{A dataframe of geochronological limits.}
 }
 \description{
 Plot a single tree with a title and a geochronological axis
