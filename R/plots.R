@@ -772,10 +772,7 @@ plot_phylo <- function(tree,
     }
   }
   match.arg(arg = plot_type, choices = c("phyloch", "strap", "phytools"))
-  if(is.null(geologic_timescale)){
-    geologic_timescale <- "strat2012"
-  }
-  if ("strat2012" %in% geologic_timescale) {
+  if (is.null(geologic_timescale) | "strat2012" %in% geologic_timescale) {
     utils::data("strat2012", package = "phyloch")
     geologic_timescale <- strat2012
   }
@@ -807,15 +804,22 @@ plot_phylo <- function(tree,
             gridcol = c("gray80", "white"),
             cex = 0.5,
             gridty = "twodash")
+    graphics::mtext("Time (MYA)",
+                    cex = cex,
+                    side = 1,
+                    font = 2,
+                    line = (pho$omi1-0.2)/0.2,
+                    outer = TRUE,
+                    at = 0.4)
   }
   if("phytools" %in% plot_type){
     # TODO
     message("Plotting a geologic time axis with phytools is not supported yet.")
   }
   if("strap" %in% plot_type){
-    tree$root.time <- time_depth
+    tree$root.time <- phylo_length
     strap::geoscalePhylo(tree = tree,
-                         x.lim = c(0, time_depth),
+                         x.lim = c(0, phylo_length),
                          cex.tip = 0.7,
                          cex.ts = 0.7,
                          cex.age = 0.7,
@@ -826,9 +830,9 @@ plot_phylo <- function(tree,
                          erotate = 90,
                          quat.rm = TRUE,
                          units = unit)
+    graphics::mtext("Time (MYA)", cex = cex, side = 1, font = 2, line = (pho$omi1-0.2)/0.2,
+    outer = FALSE, at = 1)
   }
-  graphics::mtext("Time (MYA)", cex = cex, side = 1, font = 2, line = (pho$omi1-0.2)/0.2,
-  outer = TRUE, at = 0.4)
 
   if(!is.null(title)){
     titlei <- wrap_string_to_plot(string = title, max_cex = 1, whole = FALSE)

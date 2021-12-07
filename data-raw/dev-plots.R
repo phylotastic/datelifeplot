@@ -7,29 +7,30 @@ usethis::use_dev_package("phyloch", type = "imports", remote = "fmichonneau/phyl
 
 # strap plot:
 devtools::install("../datelifeplot/.")
-tree$root.time <- max(ape::branching.times(tree))*1.2
-strap::geoscalePhylo(tree = ape::ladderize(tree,right=FALSE),
-                     units=c("Period"),
-                     boxes="Period",
-                     cex.tip=0.5,
-                     cex.age=0.7,
-                     cex.ts=0.7,
-                     label.offset=0,
-                     lwd=3,
-                     width=2)
 
-geoscalePhylo(tree=tree, boxes="Age", cex.tip=0.4)
+phylo_sdm <- datelife::datelife_search(input = c("Delphinus_delphis", "Gallus gallus", "elephas Maximus", "felis_catus", "homo-sapiens"),
+                                       use_tnrs = TRUE,
+                                       summary_format = "phylo_sdm")
+class(phylo_sdm) <- "phylo"
 
-datelifeplot::plot_phylo(phylo_sdm, title = "", axis_type = 3)
-
+tree <- phylo_sdm
+phylo_length <- max(ape::branching.times(tree))
+time_depth <- round(phylo_length*1.2, digits = -1)
+tree$root.time <- phylo_length
+unit = "Period"
 strap::geoscalePhylo(tree = tree,
-                     x.lim = c(0, time_depth),
+                     x.lim = c(0, phylo_length),
                      cex.tip = 0.7,
+                     show.tip.label = FALSE,
                      cex.ts = 0.7,
                      cex.age = 0.7,
                      width = 4,
-                     tick.scale = 15,
-                     boxes = "Epoch",
-                     erotate = 90,
+                     tick.scale = "no",
+# creates boxes with the last unit in argument "unit":
+                     boxes = unit[length(unit)],
                      quat.rm = TRUE,
-                     units = c("Period","Epoch"))
+                     units = unit)
+
+
+#
+datelifeplot::plot_phylo(phylo_sdm, title = "", plot_type = "strap")
