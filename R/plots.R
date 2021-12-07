@@ -723,12 +723,21 @@ plot_phylo_all <- function(trees, cex = graphics::par("cex"), include = TRUE, in
   #   )
   # }
 }
-#' plot one tree with study title and geochronological axis
+#' Plot a single tree with a title and a geochronological axis
 #'
-#' @param tree A tree either as a newick character string or as a phylo object
-#' @param title A character string giving the name and path to write the files to.
-#' @param time_depth A numeric vector indicating the upper limit on the time x axis scale.
-#' @param axis_type A numeric vector indicating the type of geochronological axis to plot. See examples.
+#' @details [plot_phylo()] uses the [ape::plot.phylo()] function from the package ape.
+#'
+#' @param tree A tree either as a newick character string or as a `phylo` object.
+#' @param title A character string providing the title for the plot.
+#' @param time_depth A numeric vector indicating the upper limit on the x axis time scale.
+#' @param axis_type A numeric or character vector of length one indicating the type of geochronological
+#' axis to plot. Options are:
+#' \describe{
+#' 	\item{1}{It uses the function [phyloch::axisGeo()] from the package [phyloch], with `"period"` as `units`.}
+#' 	\item{2}{It also uses the function [phyloch::axisGeo()] from the package [phyloch], with `c("period", "epoch"` as `units`.}
+#' 	\item{3}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
+#' 	}
+
 #' @param mai4 A numeric vector of length one indicating the space needed for plotting whole tip labels (right margin of the plot).
 #' @param write A character vector of length 1. Use pdf or png to write a file on those formats respectively. Anything else will not write any image file.
 #' @inheritParams ape::plot.phylo
@@ -744,9 +753,11 @@ plot_phylo <- function(tree,
                        mai4 = NULL,
                        write = "nothing",
                        file_name = NULL,
-                       GTS = utils::getAnywhere("strat2012")){
+                       GTS = "strat2012"){
   if(is.null(GTS)){
-    # utils::data(strat2012)
+    GTS <- "strat2012"
+  }
+  if ("strat2012" %in% GTS) {
     GTS <- utils::getAnywhere("strat2012")
   }
   if(is.null(time_depth) & !is.null(tree$edge.length)){
@@ -779,21 +790,37 @@ plot_phylo <- function(tree,
         label.offset = 0.5, x.lim = c(0, time_depth), root.edge = TRUE, plot = TRUE)  #, ...
   }
   graphics::par(xpd = FALSE)
-  if(!is.null(tree$edge.length)){
+  if (!is.null(tree$edge.length)) {
+    axis_type <- as.numeric(axis_type)
       if(axis_type == 1){
-        axisGeo(GTS = GTS, unit = c("period"),
-            col = c("gray80", "white"), gridcol = c("gray80", "white"), cex = 0.5,
-            gridty = "twodash")
+        axisGeo(GTS = GTS,
+                unit = c("period"),
+                col = c("gray80", "white"),
+                gridcol = c("gray80", "white"),
+                cex = 0.5,
+                gridty = "twodash")
       }
       if(axis_type == 2){
-        axisGeo(GTS = GTS, unit = c("period","epoch"),
-            col = c("gray80", "white"), gridcol = c("gray80", "white"), cex = 0.5,
-            gridty = "twodash")
+        axisGeo(GTS = GTS,
+                unit = c("period","epoch"),
+                col = c("gray80", "white"),
+                gridcol = c("gray80", "white"),
+                cex = 0.5,
+                gridty = "twodash")
       }
       if(axis_type == 3){
-        strap::geoscalePhylo(tree=tree, ages=tree$ranges.used, cex.tip=0.7,
-          cex.ts=0.7,cex.age=0.7, width=4, tick.scale = 15, boxes = "Epoch", erotate = 90,
-          quat.rm=TRUE, units=c("Period","Epoch"), x.lim=c(65,-10))
+        strap::geoscalePhylo(tree=tree,
+                             ages=tree$ranges.used,
+                             cex.tip=0.7,
+                             cex.ts=0.7,
+                             cex.age=0.7,
+                             width=4,
+                             tick.scale = 15,
+                             boxes = "Epoch",
+                             erotate = 90,
+                             quat.rm=TRUE,
+                             units=c("Period","Epoch"),
+                             x.lim=c(65,-10))
       }
       graphics::mtext("Time (MYA)", cex = cex, side = 1, font = 2, line = (ho$omi1-0.2)/0.2,
       outer = TRUE, at = 0.4)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plots.R
 \name{plot_phylo}
 \alias{plot_phylo}
-\title{plot one tree with study title and geochronological axis}
+\title{Plot a single tree with a title and a geochronological axis}
 \usage{
 plot_phylo(
   tree,
@@ -13,17 +13,23 @@ plot_phylo(
   mai4 = NULL,
   write = "nothing",
   file_name = NULL,
-  GTS = utils::getAnywhere("strat2012")
+  GTS = "strat2012"
 )
 }
 \arguments{
-\item{tree}{A tree either as a newick character string or as a phylo object}
+\item{tree}{A tree either as a newick character string or as a `phylo` object.}
 
-\item{title}{A character string giving the name and path to write the files to.}
+\item{title}{A character string providing the title for the plot.}
 
-\item{time_depth}{A numeric vector indicating the upper limit on the time x axis scale.}
+\item{time_depth}{A numeric vector indicating the upper limit on the x axis time scale.}
 
-\item{axis_type}{A numeric vector indicating the type of geochronological axis to plot. See examples.}
+\item{axis_type}{A numeric or character vector of length one indicating the type of geochronological
+axis to plot. Options are:
+\describe{
+    \item{1}{It uses the function [phyloch::axisGeo()] from the package [phyloch], with `"period"` as `units`.}
+    \item{2}{It also uses the function [phyloch::axisGeo()] from the package [phyloch], with `c("period", "epoch"` as `units`.}
+    \item{3}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
+    }}
 
 \item{cex}{a numeric value giving the factor scaling of the tip and
     node labels (Character EXpansion). The default is to take the
@@ -38,5 +44,8 @@ plot_phylo(
 \item{GTS}{A dataframe of geochronological limits.}
 }
 \description{
-plot one tree with study title and geochronological axis
+Plot a single tree with a title and a geochronological axis
+}
+\details{
+[plot_phylo()] uses the [ape::plot.phylo()] function from the package ape.
 }

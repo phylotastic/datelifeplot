@@ -44,7 +44,7 @@ should be written as spaces (the default) or left as are (if TRUE).}
     \item{\code{label.offset}}{a numeric giving the space between the nodes and the tips of the
 phylogeny and their corresponding labels.}
     \item{\code{scale.bar}}{a logical specifying whether add scale.bar to the plot.}
-    \item{\code{jitter}}{allows to shift treees. a list with two arguments: the amount of
+    \item{\code{jitter}}{allows to shift trees. a list with two arguments: the amount of
 jitter and random or equally spaced (see details below)}
   }}
 }
