@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_node_ages.R
 \name{plot_node_ages}
 \alias{plot_node_ages}
-\title{Add Node Age/Calibration Data to a Plotted Phylogeny}
+\title{Plot a Chronogram and Add Node Age/Calibration Data to Nodes}
 \usage{
 plot_node_ages(
   phy,
@@ -11,21 +11,21 @@ plot_node_ages(
   color_points,
   pch = 20,
   cex_pch = 1,
-  color_bars,
-  lty_bars,
-  lwd_bars
+  color_bars = "#80808050",
+  lty_bars = "solid",
+  lwd_bars = 7
 )
 }
 \arguments{
-\item{phy}{A phylo object with branch length proportional to time}
+\item{phy}{A `phylo` object with branch length proportional to time}
 
 \item{cex_tips}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
-size scaling factor) of `phy` tip labels. Default to 1.}
+size scaling factor) for `phy` tip labels. Default to 1.}
 
 \item{calibration_summary}{An output of [datelife:::summary.matchedCalibrations()]}
 
-\item{color_points}{A named vector of colors. Names must correspond to study
-in `calibration_summary$references`.
+\item{color_points}{A named vector of colors. Names must correspond to study names
+in `calibration_summary$in_phy$references`.
 If vector is not named, colors will be recycled.}
 
 \item{pch}{A numeric vector indicating the type of point to plot.
@@ -35,14 +35,16 @@ See [graphics::par()] for options. Defaults to 20 = "bullet circle".}
 size scaling factor) of node age point symbols defined by `pch`. Default to 1.}
 
 \item{color_bars}{A character vector of one element indicating the color for
-the bars. Default to "gray".}
+ node age distribution bars. Defaults to "#80808050", which is hex for gray
+("#808080") with 50\% transparency.}
 
 \item{lty_bars}{A numeric vector or character string indicating the plotting
-line type for bars. See [graphics::par()] for options. Defaults to 1 = "solid".}
+line type for bars. See [graphics::par()] for options. Default to "solid" (1 if numeric).}
 
 \item{lwd_bars}{A numeric vector indicating the plotting width for bars.
-See [graphics::par()] for options. Defaults to 2.}
+See [graphics::par()] for options. Default to 7.}
 }
 \description{
-Add Node Age/Calibration Data to a Plotted Phylogeny
+`plot_node_ages` plots a chronograms given in `phy` and adds age
+  data [points()] from `calibration_summary` to the corresponding nodes.
 }
