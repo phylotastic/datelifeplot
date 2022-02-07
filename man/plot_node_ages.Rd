@@ -8,9 +8,12 @@ plot_node_ages(
   phy,
   cex_tips = 1,
   calibration_summary,
-  color,
+  color_points,
   pch = 20,
-  cex_pch = 1
+  cex_pch = 1,
+  color_bars,
+  lty_bars,
+  lwd_bars
 )
 }
 \arguments{
@@ -21,11 +24,24 @@ size scaling factor) of `phy` tip labels. Default to 1.}
 
 \item{calibration_summary}{An output of [datelife:::summary.matchedCalibrations()]}
 
-\item{color}{A named vector of colors. Names must correspond to study references.
+\item{color_points}{A named vector of colors. Names must correspond to study
+in `calibration_summary$references`.
 If vector is not named, colors will be recycled.}
+
+\item{pch}{A numeric vector indicating the type of point to plot.
+See [graphics::par()] for options. Defaults to 20 = "bullet circle".}
 
 \item{cex_pch}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
 size scaling factor) of node age point symbols defined by `pch`. Default to 1.}
+
+\item{color_bars}{A character vector of one element indicating the color for
+the bars. Default to "gray".}
+
+\item{lty_bars}{A numeric vector or character string indicating the plotting
+line type for bars. See [graphics::par()] for options. Defaults to 1 = "solid".}
+
+\item{lwd_bars}{A numeric vector indicating the plotting width for bars.
+See [graphics::par()] for options. Defaults to 2.}
 }
 \description{
 Add Node Age/Calibration Data to a Plotted Phylogeny

@@ -723,6 +723,11 @@ plot_phylo_all <- function(trees, cex = graphics::par("cex"), include = TRUE, in
   #   )
   # }
 }
+
+#' @import utils
+utils::globalVariables(c("strat2012"))
+
+
 #' Plot a single chronogram with a title and a geochronological axis
 #'
 #' @details [plot_phylo()] uses different plotting functions to generate a plot
@@ -738,7 +743,6 @@ plot_phylo_all <- function(trees, cex = graphics::par("cex"), include = TRUE, in
 #' 	\item{"strap"}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
 #' 	\item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
 #' 	}
-
 #' @param mai4 A numeric vector of length one indicating the space needed for
 #'   plotting whole tip labels (right margin of the plot).
 #' @param write A character vector of length 1. Use pdf or png to write a file
