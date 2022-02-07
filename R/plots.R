@@ -574,11 +574,11 @@ plot_densitree <- function(trees, include = TRUE, ...){
   # })
   class(trees) <- "multiPhylo"
   # if we use biggest phylo as consensus for all, some data set are not plotted correctly
-  # biggest_phylo <- datelife::get_biggest_phylo(trees = trees)
+  # biggest_phylo <- datelife::get_biggest_multiphylo(trees = trees)
   # try(phangorn::densiTree(x = trees, consensus = biggest_phylo, ...))
   tryCatch(phangorn::densiTree(x = trees, ...),
   error = function(e) {
-    biggest_phylo <- datelife::get_biggest_phylo(trees = trees)
+    biggest_phylo <- datelife::get_biggest_multiphylo(trees = trees)
     try(phangorn::densiTree(x = trees, consensus = biggest_phylo, ...))
   })
 }
