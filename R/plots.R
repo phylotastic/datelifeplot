@@ -52,13 +52,13 @@ subset_trees <- function(trees, include = TRUE){
 plot_densitree <- function(trees, include = TRUE, ...){
   trees <- subset_trees(trees, include = include)
   # for densitree plot it does not really matter if trees have the same length
-  # max.depth <- round(max(sapply(trees, function(x) max(ape::branching.times(x)))) + 5, digits = -1)
-  # # max.depth <- round(max(summarize_datelife_result(datelife_result = get.filtered.results(),
+  # max_depth <- round(max(sapply(trees, function(x) max(ape::branching.times(x)))) + 5, digits = -1)
+  # # max_depth <- round(max(summarize_datelife_result(datelife_result = get.filtered.results(),
   # #             summary_format = "mrca")) + 5)  # in case we used it for a datelife object
   #
   # # plot all trees from the same depth:
   # trees <- lapply(trees, function(x) {
-  #  x$root.edge <- max.depth - max(ape::branching.times(x))
+  #  x$root.edge <- max_depth - max(ape::branching.times(x))
   #  x
   # })
   class(trees) <- "multiPhylo"
@@ -168,45 +168,79 @@ wrap_string_to_plot <- function(string, max_cex = 1, min_cex = 0.5, string_font 
 #' @param individually Boolean indicating if trees should be plotted one by one or all on the same file
 #' @inheritParams ape::plot.phylo
 #' @param file A character string giving the name and path to write the files to.
+#' @param max_depth A numeric vector of length 1, indicating the upper limit for
+#'   the time scale on the x axis for all plots. If none is provided, it is estimated
+#'   by getting the tree depth of the oldest chronogram, adds 5 and rounds to the
+#'   closest 10. See details.
+#' @details
+#' Currently, max_depth is obtained with round(max(sapply(trees, function(x) max(ape::branching.times(x)))) + 5, digits = -1)
 #' @export
 plot_phylo_all <- function(trees,
                            cex = graphics::par("cex"),
                            include = TRUE, individually = TRUE,
                            write = "no",
-                           file = "phylo_all") {
+                           file = "phylo_all",
+                           plot_type = "phyloch",
+                           max_depth) {
   trees <- subset_trees(trees, include = include)
-  if (any("tip.label" %in% names(trees))) { # in case there is just one tree in trees
+  # in case there is just one tree in trees
+  if (any("tip.label" %in% names(trees))) {
     trees <- list(trees)
   }
-  # if(isTRUE(all.equal(round(sapply(trees, function(x) max(ape::branching.times(x))), digits = 3))))
-  max.depth <- round(max(sapply(trees, function(x) max(ape::branching.times(x)))) + 5, digits = -1)
-  # max.depth <- round(max(summarize_datelife_result(datelife_result = get.filtered.results(),
-  #             summary_format = "mrca")) + 5)  # in case we used it for a datelife object
+  if (missing(max_depth)) {
+    max_depth <- round(max(sapply(trees,
+                                  function(x) max(ape::branching.times(x)))) + 5, digits = -1)
+    # if(isTRUE(all.equal(round(sapply(trees,
+    # function(x) max(ape::branching.times(x))), digits = 3))))
+    # max_depth <- round(max(summarize_datelife_result(datelife_result = get.filtered.results(),
+    #             summary_format = "mrca")) + 5)  # in case we used it for a datelife object
 
+  }
+  if (!is.numeric(max_depth)) {
+    stop("'max_depth' argument must be 'numeric'. It currently is ", max_depth)
+  }
   # plot all trees from the same depth:
   trees <- lapply(trees, function(x) {
-   x$root.edge <- max.depth - max(ape::branching.times(x))
+   x$root.edge <- max_depth - max(ape::branching.times(x))
    x
   })
   mai4 <- unique(unlist(sapply(trees, "[", "tip.label")))
   ind <- which.max(nchar(mai4))
-  mai4 <- graphics::strwidth(s = mai4[ind], units = "inches", cex = cex, font = 3)
+  mai4 <- graphics::strwidth(s = mai4[ind],
+                             units = "inches",
+                             cex = cex,
+                             font = 3)
   # if(any(lapply(trees, ape::Ntip) > 3))
   # png("~/tmp/axisgeo.png", units = "in")
   if (!any(c("png", "pdf") %in% write)) {
-  # if (!grDevices::devAskNewPage() && !names(grDevices::dev.cur()) %in% c("pdf", "postscript")) {
+  # if (!grDevices::devAskNewPage()
+  # && !names(grDevices::dev.cur()) %in% c("pdf", "postscript")) {
       grDevices::devAskNewPage(TRUE)
       # dev.size("px")
       on.exit(grDevices::devAskNewPage(FALSE))
   } else {
       dir.create(path = gsub("\\.png$|\\.pdf$", "", file))
   }
-  for (i in 1:length(trees)) {
-    file_name <- paste0(gsub("\\.png$|\\.pdf$", "", file), "/", gsub("\\.png$|\\.pdf$", "", file), "_", i, ".", write)
-    plot_phylo(trees[[i]], names(trees)[i], time_depth = max.depth, plot_type = 1, cex, mai4, write, file_name, geologic_timescale = NULL)
+  for (i in seq(trees)) {
+    file_name <- paste0(gsub("\\.png$|\\.pdf$", "", file),
+                        "/",
+                        gsub("\\.png$|\\.pdf$", "", file),
+                        "_",
+                        i,
+                        ".",
+                        write)
+    plot_phylo(trees[[i]],
+               names(trees)[i],
+               time_depth = max_depth,
+               plot_type = plot_type,
+               cex,
+               mai4,
+               write,
+               file_name,
+               geologic_timescale = NULL)
   }
   # getting an "unrecoverable" error with merge PDF:
-  # if(!individually){
+  # if (!individually) {
   #   # install_github("trinker/plotflow")
   # if we decide to use this, we should add plotflow functions in datelife package so we don't have to add it to description...
   #   plotflow:::mergePDF(
@@ -243,6 +277,7 @@ utils::globalVariables(c("strat2012"))
 #' @inheritParams phyloch::axisGeo
 #' @param file_name A character string giving the name and path to write the files to.
 #' @param geologic_timescale A dataframe of geochronological limits.
+#' @inheritDotParams ape::plot.phylo
 #' @export
 # enhance: examples of axis_types!
 plot_phylo <- function(tree,
@@ -251,10 +286,11 @@ plot_phylo <- function(tree,
                        plot_type = "phyloch",
                        cex = graphics::par("cex"),
                        mai4 = NULL,
-                       write = "nothing",
+                       write = "no",
                        file_name = NULL,
                        geologic_timescale = "strat2012",
-                       unit = "period"){
+                       unit = "period",
+                       ...){
   #
   if (!inherits(tree, "phylo")) {
       if (inherits(tree, "multiPhylo")) {
@@ -270,8 +306,8 @@ plot_phylo <- function(tree,
     return(NA)
   }
   phylo_length <- max(ape::branching.times(tree))
-  if(is.null(time_depth)){
-    if(is.null(tree$root.edge)){
+  if (is.null(time_depth)) {
+    if (is.null(tree$root.edge)) {
       time_depth <- round(phylo_length*1.2, digits = -1)
     } else {
       time_depth <- round(phylo_length + tree$root.edge, digits = -1)
@@ -282,9 +318,12 @@ plot_phylo <- function(tree,
     utils::data("strat2012", package = "phyloch")
     geologic_timescale <- strat2012
   }
-  if(is.null(mai4)){
+  if (is.null(mai4)) {
     ind <- which.max(nchar(tree$tip.label))
-    mai4 <- graphics::strwidth(s = tree$tip.label[ind], units = "inches", cex = cex, font = 3)
+    mai4 <- graphics::strwidth(s = tree$tip.label[ind],
+                               units = "inches",
+                               cex = cex,
+                               font = 3)
   }
   pho <- phylo_height_omi(tree = tree)
   if ("png" %in% write) {
@@ -295,15 +334,15 @@ plot_phylo <- function(tree,
   }
   graphics::par(xpd = NA, mai = c(0, 0, 0, mai4), omi = c(pho$omi1, 0, 1, 0))
   # plot_chronogram.phylo(trees[[i]], cex = 1.5, edge.width = 2, label.offset = 0.5,
-    # x.lim = c(0, max.depth), root.edge = TRUE, root.edge.color = "white")
-  graphics::par(xpd = FALSE)
-  if("phyloch" %in% plot_type){
+    # x.lim = c(0, max_depth), root.edge = TRUE, root.edge.color = "white")
+  # graphics::par(xpd = FALSE)
+  if ("phyloch" %in% plot_type) {
     ape::plot.phylo(tree,
                     cex = cex, #edge.width = 2,
                     label.offset = 0.5,
                     x.lim = c(0, time_depth),
                     root.edge = TRUE,
-                    plot = TRUE)  #, ...
+                    plot = TRUE, ...)  #
     axisGeo(GTS = geologic_timescale,
             unit = unit,
             col = c("gray80", "white"),
@@ -318,11 +357,11 @@ plot_phylo <- function(tree,
                     outer = TRUE,
                     at = 0.4)
   }
-  if("phytools" %in% plot_type){
+  if ("phytools" %in% plot_type) {
     # TODO
     message("Plotting a geologic time axis with phytools is not supported yet.")
   }
-  if("strap" %in% plot_type){
+  if ("strap" %in% plot_type) {
     tree$root.time <- phylo_length
     strap::geoscalePhylo(tree = tree,
                          x.lim = c(0, phylo_length),
@@ -339,13 +378,13 @@ plot_phylo <- function(tree,
     graphics::mtext("Time (MYA)", cex = cex, side = 1, font = 2, line = (pho$omi1-0.2)/0.2,
     outer = FALSE, at = 1)
   }
-
-  if(!is.null(title)){
+  # add a title to the plot
+  if (!is.null(title)) {
     titlei <- wrap_string_to_plot(string = title, max_cex = 1, whole = FALSE)
     graphics::mtext(text = titlei$wrapped, outer = TRUE,
       cex = titlei$string_cex, font = titlei$string_font, line = 1)
   }
-  if(any(c("png", "pdf") %in% write)){
+  if (any(c("png", "pdf") %in% write)) {
     grDevices::dev.off()
   }
 }

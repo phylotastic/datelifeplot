@@ -10,7 +10,9 @@ plot_phylo_all(
   include = TRUE,
   individually = TRUE,
   write = "no",
-  file = "phylo_all"
+  file = "phylo_all",
+  plot_type = "phyloch",
+  max_depth
 )
 }
 \arguments{
@@ -28,7 +30,23 @@ as indices to subset trees object.}
 on those formats respectively. Anything else will not write any file.}
 
 \item{file}{A character string giving the name and path to write the files to.}
+
+\item{plot_type}{A character vector of length one indicating the type of
+plot to generate. Options are:
+\describe{
+    \item{"phyloch"}{It uses the functions [ape::plot.phylo()] and [phyloch::axisGeo()].}
+    \item{"strap"}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
+    \item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
+    }}
+
+\item{max_depth}{A numeric vector of length 1, indicating the upper limit for
+the time scale on the x axis for all plots. If none is provided, it is estimated
+by getting the tree depth of the oldest chronogram, adds 5 and rounds to the
+closest 10. See details.}
 }
 \description{
 plot all trees with study titles and geochronological axis
+}
+\details{
+Currently, max_depth is obtained with round(max(sapply(trees, function(x) max(ape::branching.times(x)))) + 5, digits = -1)
 }
