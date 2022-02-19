@@ -2,18 +2,16 @@
 % Please edit documentation in R/plots.R
 \name{plot_densitree}
 \alias{plot_densitree}
-\title{get a densiTree plot from a set of opentree_chronograms
-if densiTree plot function throws an error, it chooses the tree with the most tips as consensus (using get_biggest_phylo)
-we found that densiTree errors commonly from failing to do a consensus tree.}
+\title{Get a densiTree plot from a set of opentree_chronograms}
 \usage{
-plot_densitree(trees, include = TRUE, ...)
+plot_densitree(chronograms, include = TRUE, ...)
 }
 \arguments{
-\item{trees}{A list of trees as multiPhylo or as a plain list object.}
+\item{chronograms}{A list of chronograms as multiPhylo or as a plain list object.}
 
 \item{include}{Boolean or numeric vector. Default to TRUE, keep all chronograms
-in trees. If FALSE, exclude chronograms with only two tips. If numeric, it is used
-as indices to subset trees object.}
+in chronograms. If FALSE, exclude chronograms with only two tips. If numeric, it is used
+as indices to subset chronograms object.}
 
 \item{...}{
   Arguments passed on to \code{\link[phangorn:densiTree]{phangorn::densiTree}}
@@ -49,7 +47,10 @@ jitter and random or equally spaced (see details below)}
   }}
 }
 \description{
-get a densiTree plot from a set of opentree_chronograms
-if densiTree plot function throws an error, it chooses the tree with the most tips as consensus (using get_biggest_phylo)
-we found that densiTree errors commonly from failing to do a consensus tree.
+Get a densiTree plot from a set of opentree_chronograms
+}
+\details{
+If [phangorn::densiTree()] throws an error, [plot_densitree()] chooses
+the chronogram with the most tips as consensus (using [datelife::get_biggest_phylo()])
+we found that [phangorn::densiTree()] errors commonly from failing to do a consensus tree.
 }

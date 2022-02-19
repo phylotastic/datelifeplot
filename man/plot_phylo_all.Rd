@@ -5,8 +5,7 @@
 \title{Plot all Chronograms with Study Titles and Geochronological Axis}
 \usage{
 plot_phylo_all(
-  trees,
-  cex = graphics::par("cex"),
+  chronograms,
   include = TRUE,
   individually = TRUE,
   write = "no",
@@ -14,19 +13,21 @@ plot_phylo_all(
   file_name = "chronogram",
   plot_type = "phyloch",
   max_depth,
+  cex_tiplabels = graphics::par("cex"),
+  cex_axislabel = graphics::par("cex"),
+  cex_axis = graphics::par("cex"),
+  cex_title = graphics::par("cex"),
   ...
 )
 }
 \arguments{
-\item{trees}{A list of chronograms as `multiPhylo` or as a plain `list` object.}
-
-\item{cex}{a real number giving the \bold{c}haracter \bold{ex}pansion.}
+\item{chronograms}{A list of chronograms as `multiPhylo` or as a plain `list` object.}
 
 \item{include}{Boolean or numeric vector. Default to TRUE, keep all chronograms
-in trees. If FALSE, exclude chronograms with only two tips. If numeric, it is used
-as indices to subset trees object.}
+in chronograms. If FALSE, exclude chronograms with only two tips. If numeric, it is used
+as indices to subset chronograms object.}
 
-\item{individually}{Boolean indicating if trees should be plotted one by one
+\item{individually}{Boolean indicating if chronograms should be plotted one by one
 or appended to the same file.}
 
 \item{write}{A character vector of length 1 indicating the file extension to
@@ -49,8 +50,16 @@ plot to generate. Options are:
 
 \item{max_depth}{A numeric vector of length 1, indicating the upper limit of
 the time scale on the x axis to be used on all plots. If none is provided, it is estimated
-by getting the tree depth of the oldest chronogram, adding 5 and rounding to the
+by getting the time depth of the oldest chronogram, adding 5 and rounding to the
 closest 10. See details for more.}
+
+\item{cex_tiplabels}{A numeric indicating character expansion for the tip labels. Default to 1.}
+
+\item{cex_axislabel}{A numeric indicating character expansion for the time axis label. Default to 1.}
+
+\item{cex_axis}{A numeric indicating character expansion for the axis. Default to 1.}
+
+\item{cex_title}{A numeric indicating character expansion for the title. Default to 1.}
 
 \item{...}{
   Arguments passed on to \code{\link[ape:plot.phylo]{ape::plot.phylo}}
@@ -98,6 +107,9 @@ closest 10. See details for more.}
     \item{\code{font}}{an integer specifying the type of font for the labels: 1
     (plain text), 2 (bold), 3 (italic, the default), or 4 (bold
     italic).}
+    \item{\code{cex}}{a numeric value giving the factor scaling of the tip and
+    node labels (Character EXpansion). The default is to take the
+    current value from the graphical parameters.}
     \item{\code{adj}}{a numeric specifying the justification of the text strings
     of the labels: 0 (left-justification), 0.5 (centering), or 1
     (right-justification). This option has no effect if \code{type =
@@ -162,5 +174,5 @@ closest 10. See details for more.}
 Plot all Chronograms with Study Titles and Geochronological Axis
 }
 \details{
-Currently, max_depth is obtained by default with `round(max(sapply(trees, function(x) max(ape::branching.times(x)))) + 5, digits = -1)`.
+Currently, max_depth is obtained by default with `round(max(sapply(chronograms, function(x) max(ape::branching.times(x)))) + 5, digits = -1)`.
 }

@@ -5,21 +5,28 @@
 \title{Plot a single chronogram with a title and a geochronological axis}
 \usage{
 plot_phylo(
-  tree,
-  title = "Tree",
+  chronogram,
+  title = "Chronogram",
   time_depth = NULL,
   plot_type = "phyloch",
-  cex = graphics::par("cex"),
   mai4 = NULL,
   write = "no",
   file_name = NULL,
   geologic_timescale = "strat2012",
-  unit = "period",
+  geologic_unit = "period",
+  cex_tiplabels = graphics::par("cex"),
+  cex_axislabel = graphics::par("cex"),
+  cex_axis = graphics::par("cex"),
+  cex_title = graphics::par("cex"),
+  pos_title = 1,
+  pos_axis = 1,
+  center_axislabel = 0.5,
+  axis_units = "Time (MYA)",
   ...
 )
 }
 \arguments{
-\item{tree}{A chronogram either as a newick character string or as a `phylo` object.}
+\item{chronogram}{A chronogram either as a newick character string or as a `phylo` object.}
 
 \item{title}{A character string providing the title for the plot.}
 
@@ -34,8 +41,6 @@ plot to generate. Options are:
     \item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
     }}
 
-\item{cex}{a real number giving the \bold{c}haracter \bold{ex}pansion.}
-
 \item{mai4}{A numeric vector of length one indicating the space needed for
 plotting whole tip labels (right margin of the plot).}
 
@@ -46,7 +51,24 @@ write the plots to. Options are "pdf" or "png". Anything else will not write a f
 
 \item{geologic_timescale}{A dataframe of geochronological limits.}
 
-\item{unit}{a vector of mode character used to select geological time units that shall be displayed. When using \code{gradstein04}, \code{"eon"}, \code{"era"}, \code{"period"}, \code{"epoch"}, and \code{"stage"} are available.}
+\item{geologic_unit}{A character vector used to select geological time units that shall be displayed. When using \code{gradstein04}, \code{"eon"}, \code{"era"}, \code{"period"}, \code{"epoch"}, and \code{"stage"} are available.}
+
+\item{cex_tiplabels}{A numeric indicating character expansion for the tip labels. Default to 1.}
+
+\item{cex_axislabel}{A numeric indicating character expansion for the time axis label. Default to 1.}
+
+\item{cex_axis}{A numeric indicating character expansion for the axis. Default to 1.}
+
+\item{cex_title}{A numeric indicating character expansion for the title. Default to 1.}
+
+\item{pos_title}{Indicates the line position of the title. Default to 1.}
+
+\item{pos_axis}{Indicates the line position of the axis. Default to 1.}
+
+\item{center_axislabel}{A numeric indicating center position of time axis label. Default to 0.5.}
+
+\item{axis_units}{A character string used to provide information on time units. Defaults
+to "Time (MYA)" (time in million years ago). If NULL, time units are not added.}
 
 \item{...}{
   Arguments passed on to \code{\link[ape:plot.phylo]{ape::plot.phylo}}
@@ -94,6 +116,9 @@ write the plots to. Options are "pdf" or "png". Anything else will not write a f
     \item{\code{font}}{an integer specifying the type of font for the labels: 1
     (plain text), 2 (bold), 3 (italic, the default), or 4 (bold
     italic).}
+    \item{\code{cex}}{a numeric value giving the factor scaling of the tip and
+    node labels (Character EXpansion). The default is to take the
+    current value from the graphical parameters.}
     \item{\code{adj}}{a numeric specifying the justification of the text strings
     of the labels: 0 (left-justification), 0.5 (centering), or 1
     (right-justification). This option has no effect if \code{type =
@@ -159,5 +184,5 @@ Plot a single chronogram with a title and a geochronological axis
 }
 \details{
 [plot_phylo()] uses different plotting functions to generate a plot
-of a given tree with a time axis representing geologic time.
+of a given chronogram with a time axis representing geologic time.
 }

@@ -22,60 +22,61 @@
 #' use_data(strat2012)
 "strat2012"
 
-#' subset trees for plotting densitree plots and phylo_all plots
-#' @param trees A list of trees as multiPhylo or as a plain list object.
+#' subset chronograms for plotting densitree plots and phylo_all plots
+#' @param chronograms A list of chronograms as multiPhylo or as a plain list object.
 #' @param include Boolean or numeric vector. Default to TRUE, keep all chronograms
-#' in trees. If FALSE, exclude chronograms with only two tips. If numeric, it is used
-#' as indices to subset trees object.
-subset_trees <- function(trees, include = TRUE){
+#' in chronograms. If FALSE, exclude chronograms with only two tips. If numeric, it is used
+#' as indices to subset chronograms object.
+subset_trees <- function(chronograms, include = TRUE){
   if(is.numeric(include)){  #if it is numeric
     include <- round(include)
-    include <- include[which(include <= length(trees))]
+    include <- include[which(include <= length(chronograms))]
     include <- sort(unique(include))
-    trees <- trees[include]
+    chronograms <- chronograms[include]
   }
   if(is.logical(include) & !is.na(include)){
       if (!include){
-      trees <- trees[sapply(trees, function (x) ape::Ntip(x)) > 2]
+      chronograms <- chronograms[sapply(chronograms, function (x) ape::Ntip(x)) > 2]
     }
   }
-  trees
+  chronograms
 }
 
-#' get a densiTree plot from a set of opentree_chronograms
-#' if densiTree plot function throws an error, it chooses the tree with the most tips as consensus (using get_biggest_phylo)
-#' we found that densiTree errors commonly from failing to do a consensus tree.
-#' @param trees A list of trees as multiPhylo or as a plain list object.
+#' Get a densiTree plot from a set of opentree_chronograms
+#' @details If [phangorn::densiTree()] throws an error, [plot_densitree()] chooses
+#' the chronogram with the most tips as consensus (using [datelife::get_biggest_phylo()])
+#' we found that [phangorn::densiTree()] errors commonly from failing to do a consensus tree.
+#' @param chronograms A list of chronograms as multiPhylo or as a plain list object.
 #' @inheritParams subset_trees
 #' @inheritDotParams phangorn::densiTree -x -consensus
 #' @export
-plot_densitree <- function(trees, include = TRUE, ...){
-  trees <- subset_trees(trees, include = include)
-  # for densitree plot it does not really matter if trees have the same length
-  # max_depth <- round(max(sapply(trees, function(x) max(ape::branching.times(x)))) + 5, digits = -1)
+plot_densitree <- function(chronograms, include = TRUE, ...) {
+  chronograms <- subset_trees(chronograms, include = include)
+  # for densitree plot it does not really matter if chronograms have the same length
+  # max_depth <- round(max(sapply(chronograms, function(x) max(ape::branching.times(x)))) + 5, digits = -1)
   # # max_depth <- round(max(summarize_datelife_result(datelife_result = get.filtered.results(),
   # #             summary_format = "mrca")) + 5)  # in case we used it for a datelife object
   #
-  # # plot all trees from the same depth:
-  # trees <- lapply(trees, function(x) {
+  # # plot all chronograms from the same depth:
+  # chronograms <- lapply(chronograms, function(x) {
   #  x$root.edge <- max_depth - max(ape::branching.times(x))
   #  x
   # })
-  class(trees) <- "multiPhylo"
+  class(chronograms) <- "multiPhylo"
   # if we use biggest phylo as consensus for all, some data set are not plotted correctly
-  # biggest_phylo <- datelife::get_biggest_multiphylo(trees = trees)
-  # try(phangorn::densiTree(x = trees, consensus = biggest_phylo, ...))
-  tryCatch(phangorn::densiTree(x = trees, ...),
+  # biggest_phylo <- datelife::get_biggest_multiphylo(chronograms = chronograms)
+  # try(phangorn::densiTree(x = chronograms, consensus = biggest_phylo, ...))
+  tryCatch(phangorn::densiTree(x = chronograms, ...),
   error = function(e) {
-    biggest_phylo <- datelife::get_biggest_multiphylo(trees = trees)
-    try(phangorn::densiTree(x = trees, consensus = biggest_phylo, ...))
+    biggest_phylo <- datelife::get_biggest_multiphylo(trees = chronograms)
+    try(phangorn::densiTree(x = chronograms, consensus = biggest_phylo, ...))
   })
 }
 
 #' get the outer margin of a graphics device from a number of tips
-#' @param tree phylo object to be plotted
-phylo_height_omi <- function(tree){
-  tipnum <- ape::Ntip(tree)
+#' @param phy `phylo` object to be plotted
+phylo_height_omi <- function(phy){
+  tipnum <- ape::Ntip(phy)
   if(tipnum > 10){
     hei <- 50 + (30 * tipnum)
   } else {
@@ -99,9 +100,12 @@ phylo_height_omi <- function(tree){
 
 }
 
-#' wrap a character string to a plotting area. It gives the optimal cex and width. It works once plot device has been called
-#' idea to use strwrap from https://stackoverflow.com/questions/7367138/text-wrap-for-plot-titles
+#' Wrap a Character String to a Plotting Area.
 #'
+#' `wrap_string_to_plot()` calculates the optimal `cex` and `width` for a character
+#' string to be added as a plot title. It works once a plot device has been called.
+#'
+#' @details Idea to use [strwrap()] from https://stackoverflow.com/questions/7367138/text-wrap-for-plot-titles
 #' @param string A character vector with the text to be plotted
 #' @param max_cex A real number, giving the maximum *cex* (**c**haracter **ex**pansion) for the string to be plotted
 #' @param min_cex minimum character expansion to be used on the title
@@ -162,10 +166,10 @@ wrap_string_to_plot <- function(string, max_cex = 1, min_cex = 0.5, string_font 
 
 #' Plot all Chronograms with Study Titles and Geochronological Axis
 #'
-#' @param trees A list of chronograms as `multiPhylo` or as a plain `list` object.
+#' @param chronograms A list of chronograms as `multiPhylo` or as a plain `list` object.
 #' @inheritParams subset_trees
 #' @inheritParams plot_phylo
-#' @param individually Boolean indicating if trees should be plotted one by one
+#' @param individually Boolean indicating if chronograms should be plotted one by one
 #' or appended to the same file.
 #' @inheritDotParams ape::plot.phylo
 #' @param folder_name A character string indicating the name of the folder to write
@@ -174,49 +178,57 @@ wrap_string_to_plot <- function(string, max_cex = 1, min_cex = 0.5, string_font 
 #' plots to. Relevant if `write = "png"` or `write = "pdf"`.
 #' @param max_depth A numeric vector of length 1, indicating the upper limit of
 #'   the time scale on the x axis to be used on all plots. If none is provided, it is estimated
-#'   by getting the tree depth of the oldest chronogram, adding 5 and rounding to the
+#'   by getting the time depth of the oldest chronogram, adding 5 and rounding to the
 #'   closest 10. See details for more.
 #' @details
-#' Currently, max_depth is obtained by default with `round(max(sapply(trees, function(x) max(ape::branching.times(x)))) + 5, digits = -1)`.
+#' Currently, max_depth is obtained by default with `round(max(sapply(chronograms, function(x) max(ape::branching.times(x)))) + 5, digits = -1)`.
 #' @export
-plot_phylo_all <- function(trees,
-                           cex = graphics::par("cex"),
+plot_phylo_all <- function(chronograms,
                            include = TRUE,
                            individually = TRUE,
                            write = "no",
                            folder_name = "phylo_all",
                            file_name = "chronogram",
                            plot_type = "phyloch",
-                           max_depth, ...) {
-  trees <- subset_trees(trees, include = include)
-  # in case there is just one tree in trees
-  if (any("tip.label" %in% names(trees))) {
-    trees <- list(trees)
+                           max_depth,
+                           cex_tiplabels = graphics::par("cex"),
+                           cex_axislabel = graphics::par("cex"),
+                           cex_axis = graphics::par("cex"),
+                           cex_title = graphics::par("cex"),
+                           ...) {
+  chronograms <- subset_trees(chronograms, include = include)
+  # in case there is just one tree in chronograms
+  if (any("tip.label" %in% names(chronograms))) {
+    chronograms <- list(chronograms)
   }
   if (missing(max_depth)) {
-    max_depth <- round(max(sapply(trees,
+    max_depth <- round(max(sapply(chronograms,
                                   function(x) max(ape::branching.times(x)))) + 5, digits = -1)
-    # if(isTRUE(all.equal(round(sapply(trees,
+    # in case we used it for a datelife object:
+    # if(isTRUE(all.equal(round(sapply(chronograms,
     # function(x) max(ape::branching.times(x))), digits = 3))))
     # max_depth <- round(max(summarize_datelife_result(datelife_result = get.filtered.results(),
-    #             summary_format = "mrca")) + 5)  # in case we used it for a datelife object
+    #             summary_format = "mrca")) + 5)
 
   }
   if (!is.numeric(max_depth)) {
     stop("'max_depth' argument must be 'numeric'. It currently is ", max_depth)
   }
-  # plot all trees from the same depth:
-  trees <- lapply(trees, function(x) {
-   x$root.edge <- max_depth - max(ape::branching.times(x))
-   x
-  })
-  mai4 <- unique(unlist(sapply(trees, "[", "tip.label")))
+  # to plot all chronograms from the same depth, add a root:
+  # using lapply was working, until it stopped working, so I replaced with a for loop
+  # chronograms <- lapply(chronograms, function(x) {
+  #   x$root.edge <- max_depth - max(ape::branching.times(x))
+  # })
+  for (i in seq(chronograms)) {
+    chronograms[[i]]$root.edge <- 45 - max(ape::branching.times(chronograms[[i]]))
+  }
+  mai4 <- unique(unlist(sapply(chronograms, "[", "tip.label")))
   ind <- which.max(nchar(mai4))
   mai4 <- graphics::strwidth(s = mai4[ind],
                              units = "inches",
-                             cex = cex,
+                             cex = cex_tiplabels,
                              font = 3)
-  # if(any(lapply(trees, ape::Ntip) > 3))
+  # if(any(lapply(chronograms, ape::Ntip) > 3))
   # png("~/tmp/axisgeo.png", units = "in")
   if (!(write %in% c("png", "pdf"))) {
   # if (!grDevices::devAskNewPage()
@@ -233,16 +245,19 @@ plot_phylo_all <- function(trees,
                       "/",
                       gsub("\\.png$|\\.pdf$", "", file_name),
                       "_")
-  for (i in seq(trees)) {
+  for (i in seq(chronograms)) {
     file_name <- paste0(file_prefix,
                         i,
                         ".",
                         write)
-    plot_phylo(trees[[i]],
-               names(trees)[i],
+    plot_phylo(chronogram = chronograms[[i]],
+               title = names(chronograms)[i],
                time_depth = max_depth,
                plot_type = plot_type,
-               cex = cex,
+               cex_tiplabels = cex_tiplabels,
+               cex_axislabel = cex_axislabel,
+               cex_axis = cex_axis,
+               cex_title = cex_title,
                mai4 = mai4,
                write = write,
                file_name = file_name,
@@ -268,9 +283,9 @@ utils::globalVariables(c("strat2012"))
 #' Plot a single chronogram with a title and a geochronological axis
 #'
 #' @details [plot_phylo()] uses different plotting functions to generate a plot
-#' of a given tree with a time axis representing geologic time.
+#' of a given chronogram with a time axis representing geologic time.
 #'
-#' @param tree A chronogram either as a newick character string or as a `phylo` object.
+#' @param chronogram A chronogram either as a newick character string or as a `phylo` object.
 #' @param title A character string providing the title for the plot.
 #' @param time_depth A numeric vector indicating the upper limit for the time scale on the x axis.
 #' @param plot_type A character vector of length one indicating the type of
@@ -288,40 +303,58 @@ utils::globalVariables(c("strat2012"))
 #' @inheritParams phyloch::axisGeo
 #' @param file_name A character string giving the name and path to write the files to.
 #' @param geologic_timescale A dataframe of geochronological limits.
+#' @param geologic_unit A character vector used to select geological time units that shall be displayed. When using \code{gradstein04}, \code{"eon"}, \code{"era"}, \code{"period"}, \code{"epoch"}, and \code{"stage"} are available.
+#' @param cex_axis A numeric indicating character expansion for the axis. Default to 1.
+#' @param cex_title A numeric indicating character expansion for the title. Default to 1.
+#' @param cex_tiplabels A numeric indicating character expansion for the tip labels. Default to 1.
+#' @param cex_axislabel A numeric indicating character expansion for the time axis label. Default to 1.
+#' @param pos_title Indicates the line position of the title. Default to 1.
+#' @param pos_axis Indicates the line position of the axis. Default to 1.
+#' @param center_axislabel A numeric indicating center position of time axis label. Default to 0.5.
+#' @param axis_units A character string used to provide information on time units. Defaults
+#' to "Time (MYA)" (time in million years ago). If NULL, time units are not added.
 #' @inheritDotParams ape::plot.phylo
 #' @export
 # enhance: examples of axis_types!
-plot_phylo <- function(tree,
-                       title = "Tree",
+plot_phylo <- function(chronogram,
+                       title = "Chronogram",
                        time_depth = NULL,
                        plot_type = "phyloch",
-                       cex = graphics::par("cex"),
                        mai4 = NULL,
                        write = "no",
                        file_name = NULL,
                        geologic_timescale = "strat2012",
-                       unit = "period",
+                       geologic_unit = "period",
+                       cex_tiplabels = graphics::par("cex"),
+                       cex_axislabel = graphics::par("cex"),
+                       cex_axis = graphics::par("cex"),
+                       cex_title = graphics::par("cex"),
+                       pos_title = 1,
+                       pos_axis = 1,
+                       center_axislabel = 0.5,
+                       axis_units = "Time (MYA)",
+                       #pos_axislabel = ,
                        ...){
   #
-  if (!inherits(tree, "phylo")) {
-      if (inherits(tree, "multiPhylo")) {
-        message("'tree' is a 'multiPhylo' object. Only first tree will be plotted.")
-        tree <- tree[[1]]
+  if (!inherits(chronogram, "phylo")) {
+      if (inherits(chronogram, "multiPhylo")) {
+        message("'chronogram' is a 'multiPhylo' object. Only first chronogram will be plotted.")
+        chronogram <- chronogram[[1]]
       } else {
-        message("'tree' must be a 'phylo' or 'multiPhylo' object.")
+        message("'chronogram' must be a 'phylo' or 'multiPhylo' object.")
         return(NA)
       }
   }
-  if (is.null(tree$edge.length)) {
-    message("Tree has no edge lengths; a tree with a geologic time axis can not be plotted.")
+  if (is.null(chronogram$edge.length)) {
+    message("'chronogram' has no edge lengths; a geologic time axis can not be plotted.")
     return(NA)
   }
-  phylo_length <- max(ape::branching.times(tree))
+  phylo_length <- max(ape::branching.times(chronogram))
   if (is.null(time_depth)) {
-    if (is.null(tree$root.edge)) {
+    if (is.null(chronogram$root.edge)) {
       time_depth <- round(phylo_length*1.2, digits = -1)
     } else {
-      time_depth <- round(phylo_length + tree$root.edge, digits = -1)
+      time_depth <- round(phylo_length + chronogram$root.edge, digits = -1)
     }
   }
   match.arg(arg = plot_type, choices = c("phyloch", "strap", "phytools", "ape"))
@@ -330,13 +363,13 @@ plot_phylo <- function(tree,
     geologic_timescale <- strat2012
   }
   if (is.null(mai4)) {
-    ind <- which.max(nchar(tree$tip.label))
-    mai4 <- graphics::strwidth(s = tree$tip.label[ind],
+    ind <- which.max(nchar(chronogram$tip.label))
+    mai4 <- graphics::strwidth(s = chronogram$tip.label[ind],
                                units = "inches",
-                               cex = cex,
+                               cex = cex_tiplabels,
                                font = 3)
   }
-  pho <- phylo_height_omi(tree = tree)
+  pho <- phylo_height_omi(phy = chronogram)
   if ("png" %in% write) {
     grDevices::png(file = file_name, height = pho$height)
   }
@@ -344,78 +377,79 @@ plot_phylo <- function(tree,
     grDevices::pdf(file = file_name, height = pho$height/72)
   }
   graphics::par(xpd = NA, mai = c(0, 0, 0, mai4), omi = c(pho$omi1, 0, 1, 0))
-  # plot_chronogram.phylo(trees[[i]], cex = 1.5, edge.width = 2, label.offset = 0.5,
+  # plot_chronogram.phylo(chronograms[[i]], cex = 1.5, edge.width = 2, label.offset = 0.5,
     # x.lim = c(0, max_depth), root.edge = TRUE, root.edge.color = "white")
   # graphics::par(xpd = FALSE)
   if (plot_type %in% c("ape", "phyloch")) {
-    ape::plot.phylo(tree,
-                    cex = cex, #edge.width = 2,
+    ape::plot.phylo(chronogram,
+                    cex = cex_tiplabels, #edge.width = 2,
                     label.offset = 0.5,
                     x.lim = c(0, time_depth),
                     root.edge = TRUE,
                     plot = TRUE, ...)  #
     if ("ape" %in% plot_type) {
-      ape::axisPhylo()
+      # TODO: fix axis not plotting all the way through the root
+      # See issue https://github.com/phylotastic/datelifeplot/issues/1
+      ape::axisPhylo(side = 1, line = pos_axis, cex.axis = cex_axis)
+      axisChrono(side = 1, unit = NULL, line = pos_axis, cex.axis = cex_axis)
     } else { # if ("phyloch" %in% plot_type) {
       axisGeo(GTS = geologic_timescale,
-              unit = unit,
+              unit = geologic_unit,
               col = c("gray80", "white"),
               gridcol = c("gray80", "white"),
-              cex = 0.5,
+              cex = cex_axis,
               gridty = "twodash")
     }
-    graphics::mtext("Time (MYA)",
-                    cex = cex,
-                    side = 1,
-                    font = 2,
-                    line = (pho$omi1-0.2)/0.2,
-                    outer = TRUE,
-                    at = 0.5)
+    # center_axislabel <- 0.5
   }
   if ("phytools" %in% plot_type) {
     # TODO
     message("Plotting a geologic time axis with phytools is not supported yet.")
   }
   if ("strap" %in% plot_type) {
-    tree$root.time <- phylo_length
-    strap::geoscalePhylo(tree = tree,
+    chronogram$root.time <- phylo_length
+    strap::geoscalePhylo(tree = chronogram,
                          x.lim = c(0, phylo_length),
                          cex.tip = 0.7,
                          cex.ts = 0.7,
                          cex.age = 0.7,
                          width = 4,
                          tick.scale = 15,
-    # creates boxes with the last unit in argument "unit":
-                         boxes = unit[length(unit)],
+    # create boxes using the smallest geologic unit in argument "geologic_unit":
+                         boxes = geologic_unit[length(geologic_unit)],
                          erotate = 90,
                          quat.rm = TRUE,
-                         units = unit)
-    graphics::mtext("Time (MYA)",
-                    cex = cex,
+                         units = axis_units)
+    # center_axislabel <- 1
+  }
+  # add a label to the axis
+  if (!is.null(units)) {
+    graphics::mtext(axis_units,
+                    cex = cex_axislabel,
                     side = 1,
                     font = 2,
                     line = (pho$omi1-0.2)/0.2,
                     outer = FALSE,
-                    at = 1)
+                    at = 0.5)#center_axislabel) # centering of the time axis label
   }
   # add a title to the plot
   if (!is.null(title)) {
-    titlei <- wrap_string_to_plot(string = title, max_cex = 1, whole = FALSE)
+    titlei <- wrap_string_to_plot(string = title, max_cex = cex_title, whole = FALSE)
     graphics::mtext(text = titlei$wrapped, outer = TRUE,
-      cex = titlei$string_cex, font = titlei$string_font, line = 1)
+      cex = titlei$string_cex, font = titlei$string_font, line = pos_title)
   }
   if (any(c("png", "pdf") %in% write)) {
     grDevices::dev.off()
   }
 }
-# tree <- plant_bold_otol_tree
-# plot_phylo_gg <- function(tree, title = "Tree", time_depth = NULL, plot_type = 1,
+# chronogram <- plant_bold_otol_tree
+# plot_phylo_gg <- function(chronogram, title = "Tree", time_depth = NULL, plot_type = 1,
 # cex = graphics::par("cex"), mai4 = NULL, write = "nothing", file_name = NULL, GTS = utils::getAnywhere("strat2012")){
-#   max_age <- max(ape::branching.times(tree))
+#   max_age <- max(ape::branching.times(chronogram))
 #   age_lim <- max_age*1.2
 #   grDevices::pdf("test.pdf")
-#   p <- ggtree::ggtree(tree) + ggtree::geom_tiplab()  + #ggplot2::xlim(age_lim*0.1,-age_lim) +
-#   ggplot2::coord_cartesian(xlim = c(age_lim*0.5,-age_lim), ylim = c(-1, ape::Ntip(tree)), expand = FALSE) +
+#   p <- ggtree::ggtree(chronogram) + ggtree::geom_tiplab()  + #ggplot2::xlim(age_lim*0.1,-age_lim) +
+#   ggplot2::coord_cartesian(xlim = c(age_lim*0.5,-age_lim), ylim = c(-1, ape::Ntip(chronogram)), expand = FALSE) +
 #   ggplot2::scale_x_continuous(breaks=seq(-age_lim,0,100), labels=abs(seq(-age_lim,0,100))) +
 #   ggtree::theme_tree2()
 #   p <- ggtree::revts(p)

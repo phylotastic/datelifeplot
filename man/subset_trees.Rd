@@ -2,17 +2,17 @@
 % Please edit documentation in R/plots.R
 \name{subset_trees}
 \alias{subset_trees}
-\title{subset trees for plotting densitree plots and phylo_all plots}
+\title{subset chronograms for plotting densitree plots and phylo_all plots}
 \usage{
-subset_trees(trees, include = TRUE)
+subset_trees(chronograms, include = TRUE)
 }
 \arguments{
-\item{trees}{A list of trees as multiPhylo or as a plain list object.}
+\item{chronograms}{A list of chronograms as multiPhylo or as a plain list object.}
 
 \item{include}{Boolean or numeric vector. Default to TRUE, keep all chronograms
-in trees. If FALSE, exclude chronograms with only two tips. If numeric, it is used
-as indices to subset trees object.}
+in chronograms. If FALSE, exclude chronograms with only two tips. If numeric, it is used
+as indices to subset chronograms object.}
 }
 \description{
-subset trees for plotting densitree plots and phylo_all plots
+subset chronograms for plotting densitree plots and phylo_all plots
 }

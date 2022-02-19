@@ -4,10 +4,10 @@
 \alias{phylo_height_omi}
 \title{get the outer margin of a graphics device from a number of tips}
 \usage{
-phylo_height_omi(tree)
+phylo_height_omi(phy)
 }
 \arguments{
-\item{tree}{phylo object to be plotted}
+\item{phy}{`phylo` object to be plotted}
 }
 \description{
 get the outer margin of a graphics device from a number of tips

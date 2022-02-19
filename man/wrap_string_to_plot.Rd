@@ -2,8 +2,7 @@
 % Please edit documentation in R/plots.R
 \name{wrap_string_to_plot}
 \alias{wrap_string_to_plot}
-\title{wrap a character string to a plotting area. It gives the optimal cex and width. It works once plot device has been called
-idea to use strwrap from https://stackoverflow.com/questions/7367138/text-wrap-for-plot-titles}
+\title{Wrap a Character String to a Plotting Area.}
 \usage{
 wrap_string_to_plot(
   string,
@@ -38,6 +37,9 @@ wrap_string_to_plot(
 \item{whole}{Boolean, indicating if the whole string should be plotted even if it surpasses the limits established in previous arguments}
 }
 \description{
-wrap a character string to a plotting area. It gives the optimal cex and width. It works once plot device has been called
-idea to use strwrap from https://stackoverflow.com/questions/7367138/text-wrap-for-plot-titles
+`wrap_string_to_plot()` calculates the optimal `cex` and `width` for a character
+string to be added as a plot title. It works once a plot device has been called.
+}
+\details{
+Idea to use [strwrap()] from https://stackoverflow.com/questions/7367138/text-wrap-for-plot-titles
 }
