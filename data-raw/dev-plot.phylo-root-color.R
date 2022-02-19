@@ -1,27 +1,27 @@
 # a variation of plot.phylo. It allows changing root edge color
-I need to fix this befor euncommenting:
-plot_chronogram.phylo: no visible global function definition for ‘par’
-plot_chronogram.phylo : .nodeHeight: no visible binding for global
-  variable ‘node_height’
-plot_chronogram.phylo : .nodeDepth: no visible binding for global
-  variable ‘node_depth’
-plot_chronogram.phylo : .nodeDepthEdgelength: no visible binding for
-  global variable ‘node_depth_edgelength’
-plot_chronogram.phylo: no visible global function definition for
-  ‘is.ultrametric’
-... 29 lines ...
-  ‘.PlotPhyloEnv’
-Undefined global functions or variables:
-  .PlotPhyloEnv circular.plot cladogram.plot is.ultrametric node_depth
-  node_depth_edgelength node_height node_height_clado par
-  phylogram.plot plot.default polar2rect rect2polar reorder segments
-  strheight strwidth text unrooted.xy
-Consider adding
-  importFrom("graphics", "par", "plot.default", "segments", "strheight",
-             "strwidth", "text")
-  importFrom("stats", "reorder")
-to your NAMESPACE file.
-#
+# I need to fix this before uncommenting:
+# plot_chronogram.phylo: no visible global function definition for ‘par’
+# plot_chronogram.phylo : .nodeHeight: no visible binding for global
+#   variable ‘node_height’
+# plot_chronogram.phylo : .nodeDepth: no visible binding for global
+#   variable ‘node_depth’
+# plot_chronogram.phylo : .nodeDepthEdgelength: no visible binding for
+#   global variable ‘node_depth_edgelength’
+# plot_chronogram.phylo: no visible global function definition for
+#   ‘is.ultrametric’
+# ... 29 lines ...
+#   ‘.PlotPhyloEnv’
+# Undefined global functions or variables:
+#   .PlotPhyloEnv circular.plot cladogram.plot is.ultrametric node_depth
+#   node_depth_edgelength node_height node_height_clado par
+#   phylogram.plot plot.default polar2rect rect2polar reorder segments
+#   strheight strwidth text unrooted.xy
+# Consider adding
+#   importFrom("graphics", "par", "plot.default", "segments", "strheight",
+#              "strwidth", "text")
+#   importFrom("stats", "reorder")
+# to your NAMESPACE file.
+# #
 
 plot_chronogram.phylo <- function (x, type = "phylogram", use.edge.length = TRUE, node.pos = NULL,
       show.tip.label = TRUE, show.node.label = FALSE, edge.color = "black",

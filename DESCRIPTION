@@ -18,7 +18,8 @@ Imports:
     phyloch (>= 1.5.5),
     phytools,
     strap,
-    graphics
+    graphics,
+    magick
 Suggests:
     knitr,
     testthat (>= 3.0.0)

@@ -28,6 +28,7 @@ plot_phylo(
 \item{plot_type}{A character vector of length one indicating the type of
 plot to generate. Options are:
 \describe{
+    \item{"ape"}{It uses the functions [ape::plot.phylo()] and [ape::axisPhylo()].}
     \item{"phyloch"}{It uses the functions [ape::plot.phylo()] and [phyloch::axisGeo()].}
     \item{"strap"}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
     \item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
@@ -38,8 +39,8 @@ plot to generate. Options are:
 \item{mai4}{A numeric vector of length one indicating the space needed for
 plotting whole tip labels (right margin of the plot).}
 
-\item{write}{A character vector of length 1. Use pdf or png to write a file
-on those formats respectively. Anything else will not write any file.}
+\item{write}{A character vector of length 1 indicating the file extension to
+write the plots to. Options are "pdf" or "png". Anything else will not write a file.}
 
 \item{file_name}{A character string giving the name and path to write the files to.}
 

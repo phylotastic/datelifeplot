@@ -160,28 +160,34 @@ wrap_string_to_plot <- function(string, max_cex = 1, min_cex = 0.5, string_font 
   string_cex = string_cex, strwrap_width = wi, string_font = string_font))
 }
 
-#' plot all trees with study titles and geochronological axis
+#' Plot all Chronograms with Study Titles and Geochronological Axis
 #'
-#' @param trees A list of trees as multiPhylo or as a plain list object.
+#' @param trees A list of chronograms as `multiPhylo` or as a plain `list` object.
 #' @inheritParams subset_trees
 #' @inheritParams plot_phylo
-#' @param individually Boolean indicating if trees should be plotted one by one or all on the same file
-#' @inheritParams ape::plot.phylo
-#' @param file A character string giving the name and path to write the files to.
-#' @param max_depth A numeric vector of length 1, indicating the upper limit for
-#'   the time scale on the x axis for all plots. If none is provided, it is estimated
-#'   by getting the tree depth of the oldest chronogram, adds 5 and rounds to the
-#'   closest 10. See details.
+#' @param individually Boolean indicating if trees should be plotted one by one
+#' or appended to the same file.
+#' @inheritDotParams ape::plot.phylo
+#' @param folder_name A character string indicating the name of the folder to write
+#' the chronogram plot files to. Default to "phylo_all". Only relevant if `write = "png"` or `write = "pdf"`.
+#' @param file_name A character string indicating a file name to write the chronogram
+#' plots to. Relevant if `write = "png"` or `write = "pdf"`.
+#' @param max_depth A numeric vector of length 1, indicating the upper limit of
+#'   the time scale on the x axis to be used on all plots. If none is provided, it is estimated
+#'   by getting the tree depth of the oldest chronogram, adding 5 and rounding to the
+#'   closest 10. See details for more.
 #' @details
-#' Currently, max_depth is obtained with round(max(sapply(trees, function(x) max(ape::branching.times(x)))) + 5, digits = -1)
+#' Currently, max_depth is obtained by default with `round(max(sapply(trees, function(x) max(ape::branching.times(x)))) + 5, digits = -1)`.
 #' @export
 plot_phylo_all <- function(trees,
                            cex = graphics::par("cex"),
-                           include = TRUE, individually = TRUE,
+                           include = TRUE,
+                           individually = TRUE,
                            write = "no",
-                           file = "phylo_all",
+                           folder_name = "phylo_all",
+                           file_name = "chronogram",
                            plot_type = "phyloch",
-                           max_depth) {
+                           max_depth, ...) {
   trees <- subset_trees(trees, include = include)
   # in case there is just one tree in trees
   if (any("tip.label" %in% names(trees))) {
@@ -212,20 +218,23 @@ plot_phylo_all <- function(trees,
                              font = 3)
   # if(any(lapply(trees, ape::Ntip) > 3))
   # png("~/tmp/axisgeo.png", units = "in")
-  if (!any(c("png", "pdf") %in% write)) {
+  if (!(write %in% c("png", "pdf"))) {
   # if (!grDevices::devAskNewPage()
   # && !names(grDevices::dev.cur()) %in% c("pdf", "postscript")) {
       grDevices::devAskNewPage(TRUE)
       # dev.size("px")
       on.exit(grDevices::devAskNewPage(FALSE))
   } else {
-      dir.create(path = gsub("\\.png$|\\.pdf$", "", file))
+      if (!dir.exists(folder_name)) {
+        dir.create(path = gsub("\\.png$|\\.pdf$", "", folder_name))
+      }
   }
+  file_prefix <- paste0(folder_name,
+                      "/",
+                      gsub("\\.png$|\\.pdf$", "", file_name),
+                      "_")
   for (i in seq(trees)) {
-    file_name <- paste0(gsub("\\.png$|\\.pdf$", "", file),
-                        "/",
-                        gsub("\\.png$|\\.pdf$", "", file),
-                        "_",
+    file_name <- paste0(file_prefix,
                         i,
                         ".",
                         write)
@@ -233,11 +242,12 @@ plot_phylo_all <- function(trees,
                names(trees)[i],
                time_depth = max_depth,
                plot_type = plot_type,
-               cex,
-               mai4,
-               write,
-               file_name,
-               geologic_timescale = NULL)
+               cex = cex,
+               mai4 = mai4,
+               write = write,
+               file_name = file_name,
+               geologic_timescale = NULL,
+               ...)
   }
   # getting an "unrecoverable" error with merge PDF:
   # if (!individually) {
@@ -266,14 +276,15 @@ utils::globalVariables(c("strat2012"))
 #' @param plot_type A character vector of length one indicating the type of
 #' plot to generate. Options are:
 #' \describe{
+#' 	\item{"ape"}{It uses the functions [ape::plot.phylo()] and [ape::axisPhylo()].}
 #' 	\item{"phyloch"}{It uses the functions [ape::plot.phylo()] and [phyloch::axisGeo()].}
 #' 	\item{"strap"}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
 #' 	\item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
 #' 	}
 #' @param mai4 A numeric vector of length one indicating the space needed for
 #'   plotting whole tip labels (right margin of the plot).
-#' @param write A character vector of length 1. Use pdf or png to write a file
-#'   on those formats respectively. Anything else will not write any file.
+#' @param write A character vector of length 1 indicating the file extension to
+#' write the plots to. Options are "pdf" or "png". Anything else will not write a file.
 #' @inheritParams phyloch::axisGeo
 #' @param file_name A character string giving the name and path to write the files to.
 #' @param geologic_timescale A dataframe of geochronological limits.
@@ -313,7 +324,7 @@ plot_phylo <- function(tree,
       time_depth <- round(phylo_length + tree$root.edge, digits = -1)
     }
   }
-  match.arg(arg = plot_type, choices = c("phyloch", "strap", "phytools"))
+  match.arg(arg = plot_type, choices = c("phyloch", "strap", "phytools", "ape"))
   if (is.null(geologic_timescale) | "strat2012" %in% geologic_timescale) {
     utils::data("strat2012", package = "phyloch")
     geologic_timescale <- strat2012
@@ -336,26 +347,30 @@ plot_phylo <- function(tree,
   # plot_chronogram.phylo(trees[[i]], cex = 1.5, edge.width = 2, label.offset = 0.5,
     # x.lim = c(0, max_depth), root.edge = TRUE, root.edge.color = "white")
   # graphics::par(xpd = FALSE)
-  if ("phyloch" %in% plot_type) {
+  if (plot_type %in% c("ape", "phyloch")) {
     ape::plot.phylo(tree,
                     cex = cex, #edge.width = 2,
                     label.offset = 0.5,
                     x.lim = c(0, time_depth),
                     root.edge = TRUE,
                     plot = TRUE, ...)  #
-    axisGeo(GTS = geologic_timescale,
-            unit = unit,
-            col = c("gray80", "white"),
-            gridcol = c("gray80", "white"),
-            cex = 0.5,
-            gridty = "twodash")
+    if ("ape" %in% plot_type) {
+      ape::axisPhylo()
+    } else { # if ("phyloch" %in% plot_type) {
+      axisGeo(GTS = geologic_timescale,
+              unit = unit,
+              col = c("gray80", "white"),
+              gridcol = c("gray80", "white"),
+              cex = 0.5,
+              gridty = "twodash")
+    }
     graphics::mtext("Time (MYA)",
                     cex = cex,
                     side = 1,
                     font = 2,
                     line = (pho$omi1-0.2)/0.2,
                     outer = TRUE,
-                    at = 0.4)
+                    at = 0.5)
   }
   if ("phytools" %in% plot_type) {
     # TODO
@@ -375,8 +390,13 @@ plot_phylo <- function(tree,
                          erotate = 90,
                          quat.rm = TRUE,
                          units = unit)
-    graphics::mtext("Time (MYA)", cex = cex, side = 1, font = 2, line = (pho$omi1-0.2)/0.2,
-    outer = FALSE, at = 1)
+    graphics::mtext("Time (MYA)",
+                    cex = cex,
+                    side = 1,
+                    font = 2,
+                    line = (pho$omi1-0.2)/0.2,
+                    outer = FALSE,
+                    at = 1)
   }
   # add a title to the plot
   if (!is.null(title)) {
