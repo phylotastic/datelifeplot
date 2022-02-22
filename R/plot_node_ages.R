@@ -119,7 +119,9 @@ plot_node_ages <- function(phy,
   }
   # Use study references to color points
   if (missing(color_pch)) {
-    color_pch <- in_phy$reference
+    color_pch_all <- in_phy$reference
+  } else {
+    color_pch_all <- color_pch[match(as.character(in_phy$reference), names(color_pch))]
   }
   for (i in unique(in_phy$mrca_node_number)) {
     rowsies <- in_phy$mrca_node_number == i
@@ -137,7 +139,7 @@ plot_node_ages <- function(phy,
   }
   graphics::points(x_ages,
          y_nodes,
-         col = color_pch,
+         col = color_pch_all,
          pch = pch,
          cex = cex_pch)
   # add a time axis
