@@ -220,7 +220,7 @@ plot_phylo_all <- function(chronograms,
   #   x$root.edge <- max_depth - max(ape::branching.times(x))
   # })
   for (i in seq(chronograms)) {
-    chronograms[[i]]$root.edge <- 45 - max(ape::branching.times(chronograms[[i]]))
+    chronograms[[i]]$root.edge <- max_depth - max(ape::branching.times(chronograms[[i]]))
   }
   mai4 <- unique(unlist(sapply(chronograms, "[", "tip.label")))
   ind <- which.max(nchar(mai4))
@@ -285,7 +285,8 @@ utils::globalVariables(c("strat2012"))
 #' @details [plot_phylo()] uses different plotting functions to generate a plot
 #' of a given chronogram with a time axis representing geologic time.
 #'
-#' @param chronogram A chronogram either as a newick character string or as a `phylo` object.
+#' @param chronogram A chronogram either as a newick character string or as a
+#' `phylo` object with branch length proportional to time.
 #' @param title A character string providing the title for the plot.
 #' @param time_depth A numeric vector indicating the upper limit for the time scale on the x axis.
 #' @param plot_type A character vector of length one indicating the type of
@@ -300,20 +301,22 @@ utils::globalVariables(c("strat2012"))
 #'   plotting whole tip labels (right margin of the plot).
 #' @param write A character vector of length 1 indicating the file extension to
 #' write the plots to. Options are "pdf" or "png". Anything else will not write a file.
-#' @inheritParams phyloch::axisGeo
 #' @param file_name A character string giving the name and path to write the files to.
 #' @param geologic_timescale A dataframe of geochronological limits.
 #' @param geologic_unit A character vector used to select geological time units that shall be displayed. When using \code{gradstein04}, \code{"eon"}, \code{"era"}, \code{"period"}, \code{"epoch"}, and \code{"stage"} are available.
-#' @param cex_axis A numeric indicating character expansion for the axis. Default to 1.
-#' @param cex_title A numeric indicating character expansion for the title. Default to 1.
-#' @param cex_tiplabels A numeric indicating character expansion for the tip labels. Default to 1.
-#' @param cex_axislabel A numeric indicating character expansion for the time axis label. Default to 1.
+#' @param cex_axis A numeric indicating character expansion for the axis. Default to value given by `graphics::par("cex")`.
+#' @param cex_title A numeric indicating character expansion for the title. Default to value given by `graphics::par("cex")`.
+#' @param cex_axislabel A numeric indicating character expansion for the time axis label. Default to value given by `graphics::par("cex")`.
 #' @param pos_title Indicates the line position of the title. Default to 1.
 #' @param pos_axis Indicates the line position of the axis. Default to 1.
 #' @param center_axislabel A numeric indicating center position of time axis label. Default to 0.5.
-#' @param axis_units A character string used to provide information on time units. Defaults
+#' @param axis_label A character string used to provide information on time units. Defaults
 #' to "Time (MYA)" (time in million years ago). If NULL, time units are not added.
+#' @param cex_tiplabels A numeric value indicating **c**haracter **ex**pansion (i.e.,
+#'  size scaling factor) of tip labels in `chronogram`. Default to value given by `graphics::par("cex")`.
+#' @inheritParams phyloch::axisGeo
 #' @inheritDotParams ape::plot.phylo
+#' @importFrom ape .PlotPhyloEnv
 #' @export
 # enhance: examples of axis_types!
 plot_phylo <- function(chronogram,
@@ -325,14 +328,14 @@ plot_phylo <- function(chronogram,
                        file_name = NULL,
                        geologic_timescale = "strat2012",
                        geologic_unit = "period",
-                       cex_tiplabels = graphics::par("cex"),
+                       cex_tiplabels = graphics::par("cex"), # inherits param from plot_node_ages
                        cex_axislabel = graphics::par("cex"),
                        cex_axis = graphics::par("cex"),
                        cex_title = graphics::par("cex"),
                        pos_title = 1,
                        pos_axis = 1,
                        center_axislabel = 0.5,
-                       axis_units = "Time (MYA)",
+                       axis_label = "Time (MYA)",
                        #pos_axislabel = ,
                        ...){
   #
@@ -387,6 +390,7 @@ plot_phylo <- function(chronogram,
                     x.lim = c(0, time_depth),
                     root.edge = TRUE,
                     plot = TRUE, ...)  #
+    lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
     if ("ape" %in% plot_type) {
       # TODO: fix axis not plotting all the way through the root
       # See issue https://github.com/phylotastic/datelifeplot/issues/1
@@ -419,18 +423,19 @@ plot_phylo <- function(chronogram,
                          boxes = geologic_unit[length(geologic_unit)],
                          erotate = 90,
                          quat.rm = TRUE,
-                         units = axis_units)
+                         units = axis_label)
     # center_axislabel <- 1
   }
   # add a label to the axis
   if (!is.null(units)) {
-    graphics::mtext(axis_units,
+    graphics::mtext(axis_label,
                     cex = cex_axislabel,
                     side = 1,
                     font = 2,
                     line = (pho$omi1-0.2)/0.2,
                     outer = FALSE,
-                    at = 0.5)#center_axislabel) # centering of the time axis label
+                    at = max(lastPP$xx) * center_axislabel # centering of the time axis label
+    )
   }
   # add a title to the plot
   if (!is.null(title)) {

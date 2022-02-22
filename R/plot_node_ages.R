@@ -2,13 +2,11 @@
 # pp$yy also stores the positions of the tips
 # the y coordinate of nodes start at pp$yy[ape::Ntip + 1]
 
-#' Plot a Chronogram and Add Node Age/Calibration Data to Nodes
+#' Plot a Chronogram and Add Age Data to Nodes
 #' @description `plot_node_ages` plots a chronograms given in `phy` and adds age
-#'   data [points()] from `calibration_summary` to the corresponding nodes.
+#'   data [points()] given in `calibration_summary` to the corresponding nodes.
 #'
-#' @param phy A `phylo` object with branch length proportional to time
-#' @param cex_tips A numeric value indicating **c**haracter **ex**pansion (i.e.,
-#'  size scaling factor) for `phy` tip labels. Default to 1.
+#' @param phy A `phylo` object with branch length proportional to time.
 #' @param calibration_summary An output of [datelife:::summary.matchedCalibrations()]
 #' @param color_points A named vector of colors. Names must correspond to study names
 #'  in `calibration_summary$in_phy$references`.
@@ -21,34 +19,80 @@
 #'  node age distribution bars. Defaults to "#80808050", which is hex for gray
 #' ("#808080") with 50\% transparency.
 #' @param lty_bars A numeric vector or character string indicating the plotting
-#'   line type for bars. See [graphics::par()] for options. Default to "solid" (1 if numeric).
-#' @param lwd_bars A numeric vector indicating the plotting width for bars.
+#'   line type for bars. See [graphics::par()] for options. Default to "solid".
+#' @param lwd_bars A numeric vector indicating the line width for age distribution bars.
 #'   See [graphics::par()] for options. Default to 7.
+#' @inheritParams plot_phylo
+#' @inheritDotParams ape::plot.phylo
 #' @importFrom ape .PlotPhyloEnv
 #' @export
 plot_node_ages <- function(phy,
-                           cex_tips = 1,
+                           #plotting_method = "plot_phylo",
+                           time_depth = NULL,
+                           plot_type = "phyloch",
+                           mai4 = NULL,
+                           title = "Chronogram",
+                           cex_title = graphics::par("cex"),
+                           pos_title = 1,
+                           geologic_timescale = "strat2012",
+                           geologic_unit = "period",
+                           pos_axis = 1,
+                           cex_tiplabels = graphics::par("cex"),
+                           axis_label = "Time (MYA)",
+                           cex_axislabel = graphics::par("cex"),
+                           center_axislabel = 0.5,
+                           cex_axis = graphics::par("cex"),
                            calibration_summary,
                            color_points,
                            pch = 20,
-                           cex_pch = 1,
+                           cex_pch = graphics::par("cex"),
                            color_bars = "#80808050",
                            lty_bars = "solid",
-                           lwd_bars = 7) {
+                           lwd_bars = 7,
+                           ...) {
   # get calibrations that are in_phy only
   in_phy <- calibration_summary$in_phy
-  # obtain max x lim from ages
-  x_max <- max(c(in_phy$MinAge,
-                 in_phy$MaxAge))
+  # obtain max x lim from calibration ages, chronogram and chronogram + root:
+  phylo_length <- max(ape::branching.times(phy))
+  max_calibration  <- max(c(in_phy$MinAge, in_phy$MaxAge))
+  if (is.null(time_depth)) {
+    print(paste("time_depth = ", time_depth))
+    if (is.null(phy$root.edge)) {
+      time_depth <- round(max(phylo_length, max_calibration)*1.2, digits = -1)
+    } else {
+      time_depth <- round(max(phylo_length + phy$root.edge, max_calibration), digits = -1)
+    }
+  }
+  # add a root to the chronogram (or extend the root) to plot from the specified time_depth
+  phy$root.edge <- time_depth - max(ape::branching.times(phy))
+  # define plotting area margins
+  if (is.null(mai4)) {
+    ind <- which.max(nchar(phy$tip.label))
+    mai4 <- graphics::strwidth(s = phy$tip.label[ind],
+                               units = "inches",
+                               cex = cex_tiplabels,
+                               font = 3)
+  }
+  pho <- phylo_height_omi(phy = phy)
+  graphics::par(xpd = NA, mai = c(0, 0, 0, mai4), omi = c(pho$omi1, 0, 1, 0))
+
   # plot.phylo
   ape::plot.phylo(phy,
-                  cex = cex_tips,
-                  plot = FALSE)
+                  cex = cex_tiplabels,
+                  label.offset = 0.5,
+                  x.lim = c(0, time_depth),
+                  root.edge = TRUE,
+                  plot = FALSE,
+                  ...)
   # get plotting x.lim
   lastPP_x.lim <- get("last_plot.phylo", envir = .PlotPhyloEnv)$x.lim[2]
   ape::plot.phylo(phy,
-                  cex = cex_tips,
-                  x.lim = c(-5,lastPP_x.lim))
+                  cex = cex_tiplabels, #edge.width = 2,
+                  label.offset = 0.5,
+                  x.lim = c(0, lastPP_x.lim),
+                  root.edge = TRUE,
+                  plot = TRUE, ...)
+
   # get recorded plotting parameters
   lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
   # we use lastPP$xx positions to get plot x position for node ages
@@ -66,7 +110,7 @@ plot_node_ages <- function(phy,
     # it generates a vector of the correct length
     y_nodes <- lastPP$yy[in_phy$mrca_node_number]
   }
-  # Using references to color points
+  # Use study references to color points
   if (missing(color_points)) {
     color_points <- in_phy$reference
   }
@@ -88,6 +132,41 @@ plot_node_ages <- function(phy,
          y_nodes,
          col = color_points,
          pch = pch)
-  ape::axisPhylo(1)
-  graphics::mtext("Time (myrs)", side = 1, line = 2, at = max(lastPP$xx) * 0.5)
+  # add a time axis
+  ## choose an axis plot_type
+  match.arg(arg = plot_type, choices = c("phyloch", "ape"))
+  ## get the geologic timescale
+  if (is.null(geologic_timescale) | "strat2012" %in% geologic_timescale) {
+    utils::data("strat2012", package = "phyloch")
+    geologic_timescale <- strat2012
+  }
+  if ("ape" %in% plot_type) {
+    # TODO: fix axis not plotting all the way through the root
+    # See issue https://github.com/phylotastic/datelifeplot/issues/1
+    ape::axisPhylo(side = 1, line = pos_axis, cex.axis = cex_axis)
+    axisChrono(side = 1, unit = NULL, line = pos_axis, cex.axis = cex_axis)
+  } else { # if ("phyloch" %in% plot_type) {
+    axisGeo(GTS = geologic_timescale,
+            unit = geologic_unit,
+            col = c("gray80", "white"),
+            gridcol = c("gray80", "white"),
+            cex = cex_axis,
+            gridty = "twodash")
+  }
+  # add a label to the axis
+  if (!is.null(units)) {
+    graphics::mtext(axis_label,
+                    cex = cex_axislabel,
+                    side = 1,
+                    font = 2,
+                    line = (pho$omi1-0.2)/0.2,
+                    outer = FALSE,
+                    at = max(lastPP$xx) * center_axislabel)# centering of the time axis label
+  }
+  # add a title to the plot
+  if (!is.null(title)) {
+    titlei <- wrap_string_to_plot(string = title, max_cex = cex_title, whole = FALSE)
+    graphics::mtext(text = titlei$wrapped, outer = TRUE,
+      cex = titlei$string_cex, font = titlei$string_font, line = pos_title)
+  }
 }

@@ -21,12 +21,13 @@ plot_phylo(
   pos_title = 1,
   pos_axis = 1,
   center_axislabel = 0.5,
-  axis_units = "Time (MYA)",
+  axis_label = "Time (MYA)",
   ...
 )
 }
 \arguments{
-\item{chronogram}{A chronogram either as a newick character string or as a `phylo` object.}
+\item{chronogram}{A chronogram either as a newick character string or as a
+`phylo` object with branch length proportional to time.}
 
 \item{title}{A character string providing the title for the plot.}
 
@@ -53,13 +54,14 @@ write the plots to. Options are "pdf" or "png". Anything else will not write a f
 
 \item{geologic_unit}{A character vector used to select geological time units that shall be displayed. When using \code{gradstein04}, \code{"eon"}, \code{"era"}, \code{"period"}, \code{"epoch"}, and \code{"stage"} are available.}
 
-\item{cex_tiplabels}{A numeric indicating character expansion for the tip labels. Default to 1.}
+\item{cex_tiplabels}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
+size scaling factor) of tip labels in `chronogram`. Default to value given by `graphics::par("cex")`.}
 
-\item{cex_axislabel}{A numeric indicating character expansion for the time axis label. Default to 1.}
+\item{cex_axislabel}{A numeric indicating character expansion for the time axis label. Default to value given by `graphics::par("cex")`.}
 
-\item{cex_axis}{A numeric indicating character expansion for the axis. Default to 1.}
+\item{cex_axis}{A numeric indicating character expansion for the axis. Default to value given by `graphics::par("cex")`.}
 
-\item{cex_title}{A numeric indicating character expansion for the title. Default to 1.}
+\item{cex_title}{A numeric indicating character expansion for the title. Default to value given by `graphics::par("cex")`.}
 
 \item{pos_title}{Indicates the line position of the title. Default to 1.}
 
@@ -67,7 +69,7 @@ write the plots to. Options are "pdf" or "png". Anything else will not write a f
 
 \item{center_axislabel}{A numeric indicating center position of time axis label. Default to 0.5.}
 
-\item{axis_units}{A character string used to provide information on time units. Defaults
+\item{axis_label}{A character string used to provide information on time units. Defaults
 to "Time (MYA)" (time in million years ago). If NULL, time units are not added.}
 
 \item{...}{

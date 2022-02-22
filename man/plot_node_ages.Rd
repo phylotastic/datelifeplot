@@ -2,25 +2,74 @@
 % Please edit documentation in R/plot_node_ages.R
 \name{plot_node_ages}
 \alias{plot_node_ages}
-\title{Plot a Chronogram and Add Node Age/Calibration Data to Nodes}
+\title{Plot a Chronogram and Add Age Data to Nodes}
 \usage{
 plot_node_ages(
   phy,
-  cex_tips = 1,
+  time_depth = NULL,
+  plot_type = "phyloch",
+  mai4 = NULL,
+  title = "Chronogram",
+  cex_title = graphics::par("cex"),
+  pos_title = 1,
+  geologic_timescale = "strat2012",
+  geologic_unit = "period",
+  pos_axis = 1,
+  cex_tiplabels = graphics::par("cex"),
+  axis_label = "Time (MYA)",
+  cex_axislabel = graphics::par("cex"),
+  center_axislabel = 0.5,
+  cex_axis = graphics::par("cex"),
   calibration_summary,
   color_points,
   pch = 20,
-  cex_pch = 1,
+  cex_pch = graphics::par("cex"),
   color_bars = "#80808050",
   lty_bars = "solid",
-  lwd_bars = 7
+  lwd_bars = 7,
+  ...
 )
 }
 \arguments{
-\item{phy}{A `phylo` object with branch length proportional to time}
+\item{phy}{A `phylo` object with branch length proportional to time.}
 
-\item{cex_tips}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
-size scaling factor) for `phy` tip labels. Default to 1.}
+\item{time_depth}{A numeric vector indicating the upper limit for the time scale on the x axis.}
+
+\item{plot_type}{A character vector of length one indicating the type of
+plot to generate. Options are:
+\describe{
+    \item{"ape"}{It uses the functions [ape::plot.phylo()] and [ape::axisPhylo()].}
+    \item{"phyloch"}{It uses the functions [ape::plot.phylo()] and [phyloch::axisGeo()].}
+    \item{"strap"}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
+    \item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
+    }}
+
+\item{mai4}{A numeric vector of length one indicating the space needed for
+plotting whole tip labels (right margin of the plot).}
+
+\item{title}{A character string providing the title for the plot.}
+
+\item{cex_title}{A numeric indicating character expansion for the title. Default to value given by `graphics::par("cex")`.}
+
+\item{pos_title}{Indicates the line position of the title. Default to 1.}
+
+\item{geologic_timescale}{A dataframe of geochronological limits.}
+
+\item{geologic_unit}{A character vector used to select geological time units that shall be displayed. When using \code{gradstein04}, \code{"eon"}, \code{"era"}, \code{"period"}, \code{"epoch"}, and \code{"stage"} are available.}
+
+\item{pos_axis}{Indicates the line position of the axis. Default to 1.}
+
+\item{cex_tiplabels}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
+size scaling factor) of tip labels in `chronogram`. Default to value given by `graphics::par("cex")`.}
+
+\item{axis_label}{A character string used to provide information on time units. Defaults
+to "Time (MYA)" (time in million years ago). If NULL, time units are not added.}
+
+\item{cex_axislabel}{A numeric indicating character expansion for the time axis label. Default to value given by `graphics::par("cex")`.}
+
+\item{center_axislabel}{A numeric indicating center position of time axis label. Default to 0.5.}
+
+\item{cex_axis}{A numeric indicating character expansion for the axis. Default to value given by `graphics::par("cex")`.}
 
 \item{calibration_summary}{An output of [datelife:::summary.matchedCalibrations()]}
 
@@ -39,12 +88,121 @@ size scaling factor) of node age point symbols defined by `pch`. Default to 1.}
 ("#808080") with 50\% transparency.}
 
 \item{lty_bars}{A numeric vector or character string indicating the plotting
-line type for bars. See [graphics::par()] for options. Default to "solid" (1 if numeric).}
+line type for bars. See [graphics::par()] for options. Default to "solid".}
 
-\item{lwd_bars}{A numeric vector indicating the plotting width for bars.
+\item{lwd_bars}{A numeric vector indicating the line width for age distribution bars.
 See [graphics::par()] for options. Default to 7.}
+
+\item{...}{
+  Arguments passed on to \code{\link[ape:plot.phylo]{ape::plot.phylo}}
+  \describe{
+    \item{\code{x}}{an object of class \code{"phylo"} or of class
+    \code{"multiPhylo"}.}
+    \item{\code{type}}{a character string specifying the type of phylogeny to be
+    drawn; it must be one of "phylogram" (the default), "cladogram",
+    "fan", "unrooted", "radial" or any unambiguous abbreviation of
+    these.}
+    \item{\code{use.edge.length}}{a logical indicating whether to use the edge
+    lengths of the phylogeny to draw the branches (the default) or not
+    (if \code{FALSE}). This option has no effect if the object of class
+    \code{"phylo"} has no `edge.length' element.}
+    \item{\code{node.pos}}{a numeric taking the value 1 or 2 which specifies the
+    vertical position of the nodes with respect to their descendants. If
+    \code{NULL} (the default), then the value is determined in relation
+    to `type' and `use.edge.length' (see details).}
+    \item{\code{show.tip.label}}{a logical indicating whether to show the tip
+    labels on the phylogeny (defaults to \code{TRUE}, i.e. the labels
+    are shown).}
+    \item{\code{show.node.label}}{a logical indicating whether to show the node
+    labels on the phylogeny (defaults to \code{FALSE}, i.e. the labels
+    are not shown).}
+    \item{\code{edge.color}}{a vector of mode character giving the colours used
+    to draw the branches of the plotted phylogeny. These are taken to be
+    in the same order than the component \code{edge} of \code{phy}. If
+    fewer colours are given than the length of \code{edge}, then the
+    colours are recycled.}
+    \item{\code{edge.width}}{a numeric vector giving the width of the branches of
+    the plotted phylogeny. These are taken to be in the same order than
+    the component \code{edge} of \code{phy}. If fewer widths are given
+    than the length of \code{edge}, then these are recycled.}
+    \item{\code{edge.lty}}{same as the previous argument but for line types;
+    1: plain, 2: dashed, 3: dotted, 4: dotdash, 5: longdash, 6: twodash.}
+    \item{\code{node.color}}{a vector of mode character giving the colours used
+    to draw the perpendicular lines associated with each node of the
+    plotted phylogeny. These are taken to be
+    in the same order than the component \code{node} of \code{phy}. If
+    fewer colours are given than the length of \code{node}, then the
+    colours are recycled.}
+    \item{\code{node.width}}{as the previous argument, but for line widths.}
+    \item{\code{node.lty}}{as the previous argument, but for line types;
+    1: plain, 2: dashed, 3: dotted, 4: dotdash, 5: longdash, 6: twodash.}
+    \item{\code{font}}{an integer specifying the type of font for the labels: 1
+    (plain text), 2 (bold), 3 (italic, the default), or 4 (bold
+    italic).}
+    \item{\code{cex}}{a numeric value giving the factor scaling of the tip and
+    node labels (Character EXpansion). The default is to take the
+    current value from the graphical parameters.}
+    \item{\code{adj}}{a numeric specifying the justification of the text strings
+    of the labels: 0 (left-justification), 0.5 (centering), or 1
+    (right-justification). This option has no effect if \code{type =
+      "unrooted"}. If \code{NULL} (the default) the value is set with
+    respect of \code{direction} (see details).}
+    \item{\code{srt}}{a numeric giving how much the labels are rotated in degrees
+    (negative values are allowed resulting in clock-like rotation); the
+    value has an effect respectively to the value of
+    \code{direction} (see Examples). This option has no effect if
+    \code{type = "unrooted"}.}
+    \item{\code{no.margin}}{a logical. If \code{TRUE}, the margins are set to
+    zero and the plot uses all the space of the device (note that this
+    was the behaviour of \code{plot.phylo} up to version 0.2-1 of `ape'
+    with no way to modify it by the user, at least easily).}
+    \item{\code{root.edge}}{a logical indicating whether to draw the root edge
+    (defaults to FALSE); this has no effect if `use.edge.length = FALSE'
+    or if `type = "unrooted"'.}
+    \item{\code{label.offset}}{a numeric giving the space between the nodes and
+    the tips of the phylogeny and their corresponding labels. This
+    option has no effect if \code{type = "unrooted"}.}
+    \item{\code{underscore}}{a logical specifying whether the underscores in tip
+    labels should be written as spaces (the default) or left as are (if
+    \code{TRUE}).}
+    \item{\code{x.lim}}{a numeric vector of length one or two giving the limit(s)
+    of the x-axis. If \code{NULL}, this is computed with respect to
+    various parameters such as the string lengths of the labels and the
+    branch lengths. If a single value is given, this is taken as the
+    upper limit.}
+    \item{\code{y.lim}}{same than above for the y-axis.}
+    \item{\code{direction}}{a character string specifying the direction of the
+    tree. Four values are possible: "rightwards" (the default),
+    "leftwards", "upwards", and "downwards".}
+    \item{\code{lab4ut}}{(= labels for unrooted trees) a character string
+    specifying the display of tip labels for unrooted trees (can be
+    abbreviated): either \code{"horizontal"} where all labels are
+    horizontal (the default if \code{type = "u"}), or \code{"axial"}
+    where the labels are displayed in the axis of the corresponding
+    terminal branches. This option has an effect if \code{type = "u"},
+    \code{"f"}, or \code{"r"}.}
+    \item{\code{tip.color}}{the colours used for the tip labels, eventually
+    recycled (see examples).}
+    \item{\code{plot}}{a logical controlling whether to draw the tree. If
+    \code{FALSE}, the graphical device is set as if the tree was
+    plotted, and the coordinates are saved as well.}
+    \item{\code{rotate.tree}}{for "fan", "unrooted", or "radial" trees: the
+    rotation of the whole tree in degrees (negative values are
+    accepted).}
+    \item{\code{open.angle}}{if \code{type = "f"} or \code{"r"}, the angle in
+    degrees left blank. Use a non-zero value if you want to call
+    \code{\link[ape]{axisPhylo}} after the tree is plotted.}
+    \item{\code{node.depth}}{an integer value (1 or 2) used if branch lengths are
+    not used to plot the tree; 1: the node depths are proportional to
+    the number of tips descending from each node (the default and was the
+    only possibility previously), 2: they are evenly spaced.}
+    \item{\code{align.tip.label}}{a logical value or an integer. If \code{TRUE},
+    the tips are aligned and dotted lines are drawn between the tips of
+    the tree and the labels. If an integer, the tips are aligned and
+    this gives the type of the lines (\code{lty}).}
+  }}
 }
 \description{
 `plot_node_ages` plots a chronograms given in `phy` and adds age
-  data [points()] from `calibration_summary` to the corresponding nodes.
+  data [points()] given in `calibration_summary` to the corresponding nodes.
 }

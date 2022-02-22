@@ -53,13 +53,14 @@ the time scale on the x axis to be used on all plots. If none is provided, it is
 by getting the time depth of the oldest chronogram, adding 5 and rounding to the
 closest 10. See details for more.}
 
-\item{cex_tiplabels}{A numeric indicating character expansion for the tip labels. Default to 1.}
+\item{cex_tiplabels}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
+size scaling factor) of tip labels in `chronogram`. Default to value given by `graphics::par("cex")`.}
 
-\item{cex_axislabel}{A numeric indicating character expansion for the time axis label. Default to 1.}
+\item{cex_axislabel}{A numeric indicating character expansion for the time axis label. Default to value given by `graphics::par("cex")`.}
 
-\item{cex_axis}{A numeric indicating character expansion for the axis. Default to 1.}
+\item{cex_axis}{A numeric indicating character expansion for the axis. Default to value given by `graphics::par("cex")`.}
 
-\item{cex_title}{A numeric indicating character expansion for the title. Default to 1.}
+\item{cex_title}{A numeric indicating character expansion for the title. Default to value given by `graphics::par("cex")`.}
 
 \item{...}{
   Arguments passed on to \code{\link[ape:plot.phylo]{ape::plot.phylo}}
