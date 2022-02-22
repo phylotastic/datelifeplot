@@ -22,6 +22,9 @@
 #'   line type for bars. See [graphics::par()] for options. Default to "solid".
 #' @param lwd_bars A numeric vector indicating the line width for age distribution bars.
 #'   See [graphics::par()] for options. Default to 7.
+#' @param add_legend Default to `TRUE` adds a legend to the left of the plot.
+#' @param cex_legend A numeric value indicating **c**haracter **ex**pansion (i.e.,
+#'  size scaling factor) of legend. Default to one half the size of the axis label, `cex_axislabel * 0.5`.
 #' @inheritParams plot_phylo
 #' @inheritDotParams ape::plot.phylo
 #' @importFrom ape .PlotPhyloEnv
@@ -34,21 +37,23 @@ plot_node_ages <- function(phy,
                            title = "Chronogram",
                            cex_title = graphics::par("cex"),
                            pos_title = 1,
+                           cex_tiplabels = graphics::par("cex"),
                            geologic_timescale = "strat2012",
                            geologic_unit = "period",
                            pos_axis = 1,
-                           cex_tiplabels = graphics::par("cex"),
-                           axis_label = "Time (MYA)",
-                           cex_axislabel = graphics::par("cex"),
-                           center_axislabel = 0.5,
                            cex_axis = graphics::par("cex"),
+                           axis_label = "Time (MYA)",
+                           center_axislabel = 0.5,
+                           cex_axislabel = graphics::par("cex"),
                            calibration_summary,
-                           color_pch,
                            pch = 20,
+                           color_pch,
                            cex_pch = graphics::par("cex"),
                            color_bars = "#80808050",
                            lty_bars = "solid",
                            lwd_bars = 7,
+                           add_legend = TRUE,
+                           cex_legend = cex_axislabel*0.5,
                            ...) {
   # get calibrations that are in_phy only
   in_phy <- calibration_summary$in_phy
@@ -74,7 +79,9 @@ plot_node_ages <- function(phy,
                                font = 3)
   }
   pho <- phylo_height_omi(phy = phy)
-  graphics::par(xpd = NA, mai = c(0, 0, 0, mai4), omi = c(pho$omi1, 0, 1, 0))
+  graphics::par(xpd = NA,
+                mai = c(0, ifelse(add_legend, 2, 0), 0, mai4),
+                omi = c(pho$omi1, 0, 1, 0))
 
   # plot.phylo
   ape::plot.phylo(phy,
@@ -169,5 +176,14 @@ plot_node_ages <- function(phy,
     titlei <- wrap_string_to_plot(string = title, max_cex = cex_title, whole = FALSE)
     graphics::mtext(text = titlei$wrapped, outer = TRUE,
       cex = titlei$string_cex, font = titlei$string_font, line = pos_title)
+  }
+  if (add_legend) {
+    par(xpd=TRUE)
+    legend(x = -time_depth*0.5,
+           y = max(y_nodes),
+           legend = names(color_pch),
+           pch = 19,
+           col = color_pch,
+           cex = cex_legend)
   }
 }

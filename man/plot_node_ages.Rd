@@ -12,21 +12,23 @@ plot_node_ages(
   title = "Chronogram",
   cex_title = graphics::par("cex"),
   pos_title = 1,
+  cex_tiplabels = graphics::par("cex"),
   geologic_timescale = "strat2012",
   geologic_unit = "period",
   pos_axis = 1,
-  cex_tiplabels = graphics::par("cex"),
-  axis_label = "Time (MYA)",
-  cex_axislabel = graphics::par("cex"),
-  center_axislabel = 0.5,
   cex_axis = graphics::par("cex"),
+  axis_label = "Time (MYA)",
+  center_axislabel = 0.5,
+  cex_axislabel = graphics::par("cex"),
   calibration_summary,
-  color_pch,
   pch = 20,
+  color_pch,
   cex_pch = graphics::par("cex"),
   color_bars = "#80808050",
   lty_bars = "solid",
   lwd_bars = 7,
+  add_legend = TRUE,
+  cex_legend = cex_axislabel * 0.5,
   ...
 )
 }
@@ -53,32 +55,32 @@ plotting whole tip labels (right margin of the plot).}
 
 \item{pos_title}{Indicates the line position of the title. Default to 1.}
 
+\item{cex_tiplabels}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
+size scaling factor) of tip labels in `chronogram`. Default to value given by `graphics::par("cex")`.}
+
 \item{geologic_timescale}{A dataframe of geochronological limits.}
 
 \item{geologic_unit}{A character vector used to select geological time units that shall be displayed. When using \code{gradstein04}, \code{"eon"}, \code{"era"}, \code{"period"}, \code{"epoch"}, and \code{"stage"} are available.}
 
 \item{pos_axis}{Indicates the line position of the axis. Default to 1.}
 
-\item{cex_tiplabels}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
-size scaling factor) of tip labels in `chronogram`. Default to value given by `graphics::par("cex")`.}
+\item{cex_axis}{A numeric indicating character expansion for the axis. Default to value given by `graphics::par("cex")`.}
 
 \item{axis_label}{A character string used to provide information on time units. Defaults
 to "Time (MYA)" (time in million years ago). If NULL, time units are not added.}
 
-\item{cex_axislabel}{A numeric indicating character expansion for the time axis label. Default to value given by `graphics::par("cex")`.}
-
 \item{center_axislabel}{A numeric indicating center position of time axis label. Default to 0.5.}
 
-\item{cex_axis}{A numeric indicating character expansion for the axis. Default to value given by `graphics::par("cex")`.}
+\item{cex_axislabel}{A numeric indicating character expansion for the time axis label. Default to value given by `graphics::par("cex")`.}
 
 \item{calibration_summary}{An output of [datelife:::summary.matchedCalibrations()]}
+
+\item{pch}{A numeric vector indicating the symbol to plot age points.
+See [graphics::par()] for options. Defaults to 20 = "bullet circle".}
 
 \item{color_pch}{A named vector of colors. Names must correspond to study names
 in `calibration_summary$in_phy$references`.
 If vector is not named, colors will be recycled.}
-
-\item{pch}{A numeric vector indicating the symbol to plot age points.
-See [graphics::par()] for options. Defaults to 20 = "bullet circle".}
 
 \item{cex_pch}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
 size scaling factor) of node age point symbols defined by `pch`. Default to 1.}
@@ -92,6 +94,11 @@ line type for bars. See [graphics::par()] for options. Default to "solid".}
 
 \item{lwd_bars}{A numeric vector indicating the line width for age distribution bars.
 See [graphics::par()] for options. Default to 7.}
+
+\item{add_legend}{Default to `TRUE` adds a legend to the left of the plot.}
+
+\item{cex_legend}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
+size scaling factor) of legend. Default to one half the size of the axis label, `cex_axislabel * 0.5`.}
 
 \item{...}{
   Arguments passed on to \code{\link[ape:plot.phylo]{ape::plot.phylo}}
