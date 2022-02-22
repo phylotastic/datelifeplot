@@ -21,7 +21,7 @@ plot_node_ages(
   center_axislabel = 0.5,
   cex_axis = graphics::par("cex"),
   calibration_summary,
-  color_points,
+  color_pch,
   pch = 20,
   cex_pch = graphics::par("cex"),
   color_bars = "#80808050",
@@ -73,11 +73,11 @@ to "Time (MYA)" (time in million years ago). If NULL, time units are not added.}
 
 \item{calibration_summary}{An output of [datelife:::summary.matchedCalibrations()]}
 
-\item{color_points}{A named vector of colors. Names must correspond to study names
+\item{color_pch}{A named vector of colors. Names must correspond to study names
 in `calibration_summary$in_phy$references`.
 If vector is not named, colors will be recycled.}
 
-\item{pch}{A numeric vector indicating the type of point to plot.
+\item{pch}{A numeric vector indicating the symbol to plot age points.
 See [graphics::par()] for options. Defaults to 20 = "bullet circle".}
 
 \item{cex_pch}{A numeric value indicating **c**haracter **ex**pansion (i.e.,

@@ -8,10 +8,10 @@
 #'
 #' @param phy A `phylo` object with branch length proportional to time.
 #' @param calibration_summary An output of [datelife:::summary.matchedCalibrations()]
-#' @param color_points A named vector of colors. Names must correspond to study names
+#' @param color_pch A named vector of colors. Names must correspond to study names
 #'  in `calibration_summary$in_phy$references`.
 #'  If vector is not named, colors will be recycled.
-#' @param pch A numeric vector indicating the type of point to plot.
+#' @param pch A numeric vector indicating the symbol to plot age points.
 #'   See [graphics::par()] for options. Defaults to 20 = "bullet circle".
 #' @param cex_pch A numeric value indicating **c**haracter **ex**pansion (i.e.,
 #'  size scaling factor) of node age point symbols defined by `pch`. Default to 1.
@@ -43,7 +43,7 @@ plot_node_ages <- function(phy,
                            center_axislabel = 0.5,
                            cex_axis = graphics::par("cex"),
                            calibration_summary,
-                           color_points,
+                           color_pch,
                            pch = 20,
                            cex_pch = graphics::par("cex"),
                            color_bars = "#80808050",
@@ -111,8 +111,8 @@ plot_node_ages <- function(phy,
     y_nodes <- lastPP$yy[in_phy$mrca_node_number]
   }
   # Use study references to color points
-  if (missing(color_points)) {
-    color_points <- in_phy$reference
+  if (missing(color_pch)) {
+    color_pch <- in_phy$reference
   }
   for (i in unique(in_phy$mrca_node_number)) {
     rowsies <- in_phy$mrca_node_number == i
@@ -130,8 +130,9 @@ plot_node_ages <- function(phy,
   }
   graphics::points(x_ages,
          y_nodes,
-         col = color_points,
-         pch = pch)
+         col = color_pch,
+         pch = pch,
+         cex = cex_pch)
   # add a time axis
   ## choose an axis plot_type
   match.arg(arg = plot_type, choices = c("phyloch", "ape"))
