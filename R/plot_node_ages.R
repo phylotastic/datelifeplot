@@ -11,6 +11,8 @@
 #' @param color_pch A named vector of colors. Names must correspond to study names
 #'  in `calibration_summary$in_phy$references`.
 #'  If vector is not named, colors will be recycled.
+#' @param transparent_pch A numeric value ranging from 10-99, indicating
+#' transparency for `color_pch`. Default to `NULL`, no transparency.
 #' @param pch A numeric vector indicating the symbol to plot age points.
 #'   See [graphics::par()] for options. Defaults to 20 = "bullet circle".
 #' @param cex_pch A numeric value indicating **c**haracter **ex**pansion (i.e.,
@@ -22,9 +24,11 @@
 #'   line type for bars. See [graphics::par()] for options. Default to "solid".
 #' @param lwd_bars A numeric vector indicating the line width for age distribution bars.
 #'   See [graphics::par()] for options. Default to 7.
-#' @param add_legend Default to `TRUE` adds a legend to the left of the plot.
+#' @param add_legend Default to `TRUE`, adds a legend to the left of the plot.
 #' @param cex_legend A numeric value indicating **c**haracter **ex**pansion (i.e.,
 #'  size scaling factor) of legend. Default to one half the size of the axis label, `cex_axislabel * 0.5`.
+#' @param x_legend the x co-ordinate to be used to position the legend on the left side of the plot.
+#' @param y_legend the y co-ordinate to be used to position the legend on the left side of the plot.
 #' @inheritParams plot_phylo
 #' @inheritDotParams ape::plot.phylo
 #' @importFrom ape .PlotPhyloEnv
@@ -48,12 +52,15 @@ plot_node_ages <- function(phy,
                            calibration_summary,
                            pch = 20,
                            color_pch,
+                           transparent_pch = NULL,
                            cex_pch = graphics::par("cex"),
                            color_bars = "#80808050",
                            lty_bars = "solid",
                            lwd_bars = 7,
                            add_legend = TRUE,
                            cex_legend = cex_axislabel*0.5,
+                           x_legend = NULL,
+                           y_legend = NULL,
                            ...) {
   # get calibrations that are in_phy only
   in_phy <- calibration_summary$in_phy
@@ -123,6 +130,10 @@ plot_node_ages <- function(phy,
   } else {
     color_pch_all <- color_pch[match(as.character(in_phy$reference), names(color_pch))]
   }
+  if (!is.null(transparent_pch)) {
+    color_pch_all <- gplots::col2hex(color_pch_all)
+    color_pch_all <- paste0(color_pch_all, transparent_pch)
+  }
   for (i in unique(in_phy$mrca_node_number)) {
     rowsies <- in_phy$mrca_node_number == i
     x_min <- min(x_ages[rowsies])
@@ -180,9 +191,11 @@ plot_node_ages <- function(phy,
       cex = titlei$string_cex, font = titlei$string_font, line = pos_title)
   }
   if (add_legend) {
-    par(xpd=TRUE)
-    legend(x = -time_depth*0.5,
-           y = max(y_nodes),
+    graphics::par(xpd=TRUE) # so it's clipped in the outer margin
+    message("Current legend x co-ordinate is set to ", ifelse(is.null(x_legend), -time_depth*0.5, x_legend))
+    message("And y co-ordinate is set to ", ifelse(is.null(y_legend), max(y_nodes), y_legend))
+    graphics::legend(x = ifelse(is.null(x_legend), -time_depth*0.5, x_legend),
+           y = ifelse(is.null(y_legend), max(y_nodes), y_legend),
            legend = names(color_pch),
            pch = 19,
            col = color_pch,

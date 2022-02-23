@@ -19,7 +19,8 @@ Imports:
     phytools,
     strap,
     graphics,
-    magick
+    gplots,
+    viridis
 Suggests:
     knitr,
     testthat (>= 3.0.0)

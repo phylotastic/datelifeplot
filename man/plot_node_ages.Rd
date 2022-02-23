@@ -23,12 +23,15 @@ plot_node_ages(
   calibration_summary,
   pch = 20,
   color_pch,
+  transparent_pch = NULL,
   cex_pch = graphics::par("cex"),
   color_bars = "#80808050",
   lty_bars = "solid",
   lwd_bars = 7,
   add_legend = TRUE,
   cex_legend = cex_axislabel * 0.5,
+  x_legend = NULL,
+  y_legend = NULL,
   ...
 )
 }
@@ -82,6 +85,9 @@ See [graphics::par()] for options. Defaults to 20 = "bullet circle".}
 in `calibration_summary$in_phy$references`.
 If vector is not named, colors will be recycled.}
 
+\item{transparent_pch}{A numeric value ranging from 10-99, indicating
+transparency for `color_pch`. Default to `NULL`, no transparency.}
+
 \item{cex_pch}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
 size scaling factor) of node age point symbols defined by `pch`. Default to 1.}
 
@@ -95,10 +101,14 @@ line type for bars. See [graphics::par()] for options. Default to "solid".}
 \item{lwd_bars}{A numeric vector indicating the line width for age distribution bars.
 See [graphics::par()] for options. Default to 7.}
 
-\item{add_legend}{Default to `TRUE` adds a legend to the left of the plot.}
+\item{add_legend}{Default to `TRUE`, adds a legend to the left of the plot.}
 
 \item{cex_legend}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
 size scaling factor) of legend. Default to one half the size of the axis label, `cex_axislabel * 0.5`.}
+
+\item{x_legend}{the x co-ordinate to be used to position the legend on the left side of the plot.}
+
+\item{y_legend}{the y co-ordinate to be used to position the legend on the left side of the plot.}
 
 \item{...}{
   Arguments passed on to \code{\link[ape:plot.phylo]{ape::plot.phylo}}
