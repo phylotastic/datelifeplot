@@ -17,6 +17,14 @@ plot_phylo_all(
   cex_axislabel = graphics::par("cex"),
   cex_axis = graphics::par("cex"),
   cex_title = graphics::par("cex"),
+  mai1,
+  mai2,
+  mai3,
+  mai4,
+  omi1,
+  omi2,
+  omi3,
+  omi4,
   ...
 )
 }
@@ -61,6 +69,30 @@ size scaling factor) of tip labels in `chronogram`. Default to value given by `g
 \item{cex_axis}{A numeric indicating character expansion for the axis. Default to value given by `graphics::par("cex")`.}
 
 \item{cex_title}{A numeric indicating character expansion for the title. Default to value given by `graphics::par("cex")`.}
+
+\item{mai1}{A numeric value indicating internal plot margin sizes
+in inches. `mai4` is particularly important as it indicates the space needed for
+plotting whole tip labels on the right margin of the plot.}
+
+\item{mai2}{A numeric value indicating internal plot margin sizes
+in inches. `mai4` is particularly important as it indicates the space needed for
+plotting whole tip labels on the right margin of the plot.}
+
+\item{mai3}{A numeric value indicating internal plot margin sizes
+in inches. `mai4` is particularly important as it indicates the space needed for
+plotting whole tip labels on the right margin of the plot.}
+
+\item{mai4}{A numeric value indicating internal plot margin sizes
+in inches. `mai4` is particularly important as it indicates the space needed for
+plotting whole tip labels on the right margin of the plot.}
+
+\item{omi1}{A numeric value indicating outter plot margin sizes in inches.}
+
+\item{omi2}{A numeric value indicating outter plot margin sizes in inches.}
+
+\item{omi3}{A numeric value indicating outter plot margin sizes in inches.}
+
+\item{omi4}{A numeric value indicating outter plot margin sizes in inches.}
 
 \item{...}{
   Arguments passed on to \code{\link[ape:plot.phylo]{ape::plot.phylo}}

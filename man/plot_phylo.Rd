@@ -9,7 +9,16 @@ plot_phylo(
   title = "Chronogram",
   time_depth = NULL,
   plot_type = "phyloch",
-  mai4 = NULL,
+  mai1,
+  mai2,
+  mai3,
+  mai4,
+  omi1,
+  omi2,
+  omi3,
+  omi4,
+  plot_height,
+  plot_width,
   write = "no",
   file_name = NULL,
   geologic_timescale = "strat2012",
@@ -42,8 +51,13 @@ plot to generate. Options are:
     \item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
     }}
 
-\item{mai4}{A numeric vector of length one indicating the space needed for
-plotting whole tip labels (right margin of the plot).}
+\item{mai1, mai2, mai3, mai4}{A numeric value indicating internal plot margin sizes
+in inches. `mai4` is particularly important as it indicates the space needed for
+plotting whole tip labels on the right margin of the plot.}
+
+\item{omi1, omi2, omi3, omi4}{A numeric value indicating outter plot margin sizes in inches.}
+
+\item{plot_height, plot_width}{A numeric value indicating height and width for the plot.}
 
 \item{write}{A character vector of length 1 indicating the file extension to
 write the plots to. Options are "pdf" or "png". Anything else will not write a file.}

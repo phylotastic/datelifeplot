@@ -56,9 +56,29 @@ plot to generate. Options are:
     \item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
     }}
 
-\item{mai1, mai2, mai3, mai4}{A numeric value indicating internal plot margin sizes ininches.}
+\item{mai1}{A numeric value indicating internal plot margin sizes
+in inches. `mai4` is particularly important as it indicates the space needed for
+plotting whole tip labels on the right margin of the plot.}
 
-\item{omi1, omi2, omi3, omi4}{A numeric value indicating outter plot margin sizes in inches.}
+\item{mai2}{A numeric value indicating internal plot margin sizes
+in inches. `mai4` is particularly important as it indicates the space needed for
+plotting whole tip labels on the right margin of the plot.}
+
+\item{mai3}{A numeric value indicating internal plot margin sizes
+in inches. `mai4` is particularly important as it indicates the space needed for
+plotting whole tip labels on the right margin of the plot.}
+
+\item{mai4}{A numeric value indicating internal plot margin sizes
+in inches. `mai4` is particularly important as it indicates the space needed for
+plotting whole tip labels on the right margin of the plot.}
+
+\item{omi1}{A numeric value indicating outter plot margin sizes in inches.}
+
+\item{omi2}{A numeric value indicating outter plot margin sizes in inches.}
+
+\item{omi3}{A numeric value indicating outter plot margin sizes in inches.}
+
+\item{omi4}{A numeric value indicating outter plot margin sizes in inches.}
 
 \item{title}{A character string providing the title for the plot.}
 

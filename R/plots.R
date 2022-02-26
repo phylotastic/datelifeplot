@@ -195,6 +195,8 @@ plot_phylo_all <- function(chronograms,
                            cex_axislabel = graphics::par("cex"),
                            cex_axis = graphics::par("cex"),
                            cex_title = graphics::par("cex"),
+                           mai1, mai2, mai3, mai4,
+                           omi1, omi2, omi3, omi4,
                            ...) {
   chronograms <- subset_trees(chronograms, include = include)
   # in case there is just one tree in chronograms
@@ -222,6 +224,7 @@ plot_phylo_all <- function(chronograms,
   for (i in seq(chronograms)) {
     chronograms[[i]]$root.edge <- max_depth - max(ape::branching.times(chronograms[[i]]))
   }
+  if(missing(mai4))
   mai4 <- unique(unlist(sapply(chronograms, "[", "tip.label")))
   ind <- which.max(nchar(mai4))
   mai4 <- graphics::strwidth(s = mai4[ind],
@@ -297,8 +300,11 @@ utils::globalVariables(c("strat2012"))
 #' 	\item{"strap"}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
 #' 	\item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
 #' 	}
-#' @param mai4 A numeric vector of length one indicating the space needed for
-#'   plotting whole tip labels (right margin of the plot).
+#' @param mai1,mai2,mai3,mai4 A numeric value indicating internal plot margin sizes
+#' in inches. `mai4` is particularly important as it indicates the space needed for
+#' plotting whole tip labels on the right margin of the plot.
+#' @param omi1,omi2,omi3,omi4 A numeric value indicating outter plot margin sizes in inches.
+#' @param plot_height,plot_width A numeric value indicating height and width for the plot.
 #' @param write A character vector of length 1 indicating the file extension to
 #' write the plots to. Options are "pdf" or "png". Anything else will not write a file.
 #' @param file_name A character string giving the name and path to write the files to.
@@ -323,7 +329,9 @@ plot_phylo <- function(chronogram,
                        title = "Chronogram",
                        time_depth = NULL,
                        plot_type = "phyloch",
-                       mai4 = NULL,
+                       mai1, mai2, mai3, mai4,
+                       omi1, omi2, omi3, omi4,
+                       plot_height, plot_width,
                        write = "no",
                        file_name = NULL,
                        geologic_timescale = "strat2012",
@@ -365,7 +373,16 @@ plot_phylo <- function(chronogram,
     utils::data("strat2012", package = "phyloch")
     geologic_timescale <- strat2012
   }
-  if (is.null(mai4)) {
+  if (missing(mai1)) {
+    mai1 <- 0
+  }
+  if (missing(mai2)) {
+    mai2 <- 0
+  }
+  if (missing(mai3)) {
+    mai3 <- 0
+  }
+  if (missing(mai4)) {
     ind <- which.max(nchar(chronogram$tip.label))
     mai4 <- graphics::strwidth(s = chronogram$tip.label[ind],
                                units = "inches",
@@ -373,13 +390,30 @@ plot_phylo <- function(chronogram,
                                font = 3)
   }
   pho <- phylo_height_omi(phy = chronogram)
+  message("Recommended plot area height is ", pho$height)
+  if (missing(plot_height)) {
+    plot_height <- pho$height
+  }
+  if (missing(omi1)) {
+    omi1 <- pho$omi1
+  }
+  if (missing(omi2)) {
+    omi2 <- 0
+  }
+  if (missing(omi3)) {
+    omi3 <- 1
+  }
+  if (missing(omi4)) {
+    omi4 <- 0
+  }
+
   if ("png" %in% write) {
-    grDevices::png(file = file_name, height = pho$height)
+    grDevices::png(file = file_name, height = plot_height)
   }
   if ("pdf" %in% write) {
-    grDevices::pdf(file = file_name, height = pho$height/72)
+    grDevices::pdf(file = file_name, height = plot_height/72)
   }
-  graphics::par(xpd = NA, mai = c(0, 0, 0, mai4), omi = c(pho$omi1, 0, 1, 0))
+  graphics::par(xpd = NA, mai = c(mai1, mai2, mai3, mai4), omi = c(omi1, omi2, omi3, omi4))
   # plot_chronogram.phylo(chronograms[[i]], cex = 1.5, edge.width = 2, label.offset = 0.5,
     # x.lim = c(0, max_depth), root.edge = TRUE, root.edge.color = "white")
   # graphics::par(xpd = FALSE)
@@ -432,7 +466,7 @@ plot_phylo <- function(chronogram,
                     cex = cex_axislabel,
                     side = 1,
                     font = 2,
-                    line = (pho$omi1-0.2)/0.2,
+                    line = (omi1-0.2)/0.2,
                     outer = FALSE,
                     at = max(lastPP$xx) * center_axislabel # centering of the time axis label
     )

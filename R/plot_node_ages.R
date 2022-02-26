@@ -29,8 +29,6 @@
 #'  size scaling factor) of legend. Default to one half the size of the axis label, `cex_axislabel * 0.5`.
 #' @param x_legend the x co-ordinate to be used to position the legend on the left side of the plot.
 #' @param y_legend the y co-ordinate to be used to position the legend on the left side of the plot.
-#' @param mai1,mai2,mai3,mai4 A numeric value indicating internal plot margin sizes ininches.
-#' @param omi1,omi2,omi3,omi4 A numeric value indicating outter plot margin sizes in inches.
 #' @inheritParams plot_phylo
 #' @inheritDotParams ape::plot.phylo
 #' @importFrom ape .PlotPhyloEnv
