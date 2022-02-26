@@ -29,15 +29,21 @@
 #'  size scaling factor) of legend. Default to one half the size of the axis label, `cex_axislabel * 0.5`.
 #' @param x_legend the x co-ordinate to be used to position the legend on the left side of the plot.
 #' @param y_legend the y co-ordinate to be used to position the legend on the left side of the plot.
+#' @param mai1,mai2,mai3,mai4 A numeric value indicating internal plot margin sizes ininches.
+#' @param omi1,omi2,omi3,omi4 A numeric value indicating outter plot margin sizes in inches.
 #' @inheritParams plot_phylo
 #' @inheritDotParams ape::plot.phylo
 #' @importFrom ape .PlotPhyloEnv
+#'@details Plot are margin sizes as defined by [graphics::par()$mai] and [graphics::par()$omi]
+#' are overruled within the function. To modify them you have to use the arguments
+#' `mai1`, `mai2`, `mai3` and `mai4`, and omi1, omi2, omi3 and omi4.
 #' @export
 plot_node_ages <- function(phy,
                            #plotting_method = "plot_phylo",
                            time_depth = NULL,
                            plot_type = "phyloch",
-                           mai4 = NULL,
+                           mai1, mai2, mai3, mai4,
+                           omi1, omi2, omi3, omi4,
                            title = "Chronogram",
                            cex_title = graphics::par("cex"),
                            pos_title = 1,
@@ -78,17 +84,39 @@ plot_node_ages <- function(phy,
   # add a root to the chronogram (or extend the root) to plot from the specified time_depth
   phy$root.edge <- time_depth - max(ape::branching.times(phy))
   # define plotting area margins
-  if (is.null(mai4)) {
+  if (missing(mai1)) {
+    mai1 <- 0
+  }
+  if (missing(mai2)) {
+    mai2 <- ifelse(add_legend, 2, 0)
+  }
+  if (missing(mai3)) {
+    mai3 <- 0
+  }
+  if (missing(mai4)) {
     ind <- which.max(nchar(phy$tip.label))
     mai4 <- graphics::strwidth(s = phy$tip.label[ind],
                                units = "inches",
                                cex = cex_tiplabels,
                                font = 3)
   }
-  pho <- phylo_height_omi(phy = phy)
+  if (missing(omi1)) {
+    pho <- phylo_height_omi(phy = phy)
+    omi1 <- pho$omi1
+  }
+  if (missing(omi2)) {
+    omi2 <- 0
+  }
+  if (missing(omi3)) {
+    omi3 <- 1
+  }
+  if (missing(omi4)) {
+    omi4 <- 0
+  }
   graphics::par(xpd = NA,
-                mai = c(0, ifelse(add_legend, 2, 0), 0, mai4),
-                omi = c(pho$omi1, 0, 1, 0))
+                mai = c(0, mai2, 0, mai4),
+                # par()$mai[2]
+                omi = c(omi1, 0, 1, 0))
 
   # plot.phylo
   ape::plot.phylo(phy,
@@ -180,7 +208,7 @@ plot_node_ages <- function(phy,
                     cex = cex_axislabel,
                     side = 1,
                     font = 2,
-                    line = (pho$omi1-0.2)/0.2,
+                    line = (omi1-0.2)/0.2,
                     outer = FALSE,
                     at = max(lastPP$xx) * center_axislabel)# centering of the time axis label
   }
@@ -191,11 +219,19 @@ plot_node_ages <- function(phy,
       cex = titlei$string_cex, font = titlei$string_font, line = pos_title)
   }
   if (add_legend) {
-    graphics::par(xpd=TRUE) # so it's clipped in the outer margin
-    message("Current legend x co-ordinate is set to ", ifelse(is.null(x_legend), -time_depth*0.5, x_legend))
-    message("And y co-ordinate is set to ", ifelse(is.null(y_legend), max(y_nodes), y_legend))
-    graphics::legend(x = ifelse(is.null(x_legend), -time_depth*0.5, x_legend),
-           y = ifelse(is.null(y_legend), max(y_nodes), y_legend),
+    x_legend <- ifelse(is.null(x_legend), -time_depth*0.5, x_legend)
+    y_legend <- ifelse(is.null(y_legend), max(y_nodes), y_legend)
+
+    if (x_legend <= 0) {
+      graphics::par(xpd=TRUE) # so it's clipped in the outer margin
+    }
+    if (y_legend > max(y_nodes)) {
+      graphics::par(xpd=NA) # so it's clipped in the upper margin
+    }
+    message("Current legend x co-ordinate is set to ", x_legend)
+    message("And y co-ordinate is set to ", y_legend)
+    graphics::legend(x = x_legend,
+           y = y_legend,
            legend = names(color_pch),
            pch = 19,
            col = color_pch,

@@ -8,7 +8,14 @@ plot_node_ages(
   phy,
   time_depth = NULL,
   plot_type = "phyloch",
-  mai4 = NULL,
+  mai1,
+  mai2,
+  mai3,
+  mai4,
+  omi1,
+  omi2,
+  omi3,
+  omi4,
   title = "Chronogram",
   cex_title = graphics::par("cex"),
   pos_title = 1,
@@ -49,8 +56,9 @@ plot to generate. Options are:
     \item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
     }}
 
-\item{mai4}{A numeric vector of length one indicating the space needed for
-plotting whole tip labels (right margin of the plot).}
+\item{mai1, mai2, mai3, mai4}{A numeric value indicating internal plot margin sizes ininches.}
+
+\item{omi1, omi2, omi3, omi4}{A numeric value indicating outter plot margin sizes in inches.}
 
 \item{title}{A character string providing the title for the plot.}
 
@@ -222,4 +230,9 @@ size scaling factor) of legend. Default to one half the size of the axis label, 
 \description{
 `plot_node_ages` plots a chronograms given in `phy` and adds age
   data [points()] given in `calibration_summary` to the corresponding nodes.
+}
+\details{
+Plot are margin sizes as defined by [graphics::par()$mai] and [graphics::par()$omi]
+are overruled within the function. To modify them you have to use the arguments
+`mai1`, `mai2`, `mai3` and `mai4`, and omi1, omi2, omi3 and omi4.
 }
