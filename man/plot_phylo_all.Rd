@@ -25,6 +25,8 @@ plot_phylo_all(
   omi2,
   omi3,
   omi4,
+  plot_height,
+  plot_width,
   ...
 )
 }
@@ -93,6 +95,10 @@ plotting whole tip labels on the right margin of the plot.}
 \item{omi3}{A numeric value indicating outter plot margin sizes in inches.}
 
 \item{omi4}{A numeric value indicating outter plot margin sizes in inches.}
+
+\item{plot_height}{A numeric value indicating height and width for the plot.}
+
+\item{plot_width}{A numeric value indicating height and width for the plot.}
 
 \item{...}{
   Arguments passed on to \code{\link[ape:plot.phylo]{ape::plot.phylo}}

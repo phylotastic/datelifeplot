@@ -197,6 +197,7 @@ plot_phylo_all <- function(chronograms,
                            cex_title = graphics::par("cex"),
                            mai1, mai2, mai3, mai4,
                            omi1, omi2, omi3, omi4,
+                           plot_height, plot_width,
                            ...) {
   chronograms <- subset_trees(chronograms, include = include)
   # in case there is just one tree in chronograms
@@ -261,10 +262,19 @@ plot_phylo_all <- function(chronograms,
                cex_axislabel = cex_axislabel,
                cex_axis = cex_axis,
                cex_title = cex_title,
+               mai1 = mai1,
+               mai2 = mai2,
+               mai3 = mai3,
                mai4 = mai4,
+               omi1 = omi1,
+               omi2 = omi2,
+               omi3 = omi3,
+               omi4 = omi4,
                write = write,
                file_name = file_name,
                geologic_timescale = NULL,
+               plot_height = plot_height,
+               plot_width = plot_width,
                ...)
   }
   # getting an "unrecoverable" error with merge PDF:
@@ -408,10 +418,10 @@ plot_phylo <- function(chronogram,
   }
 
   if ("png" %in% write) {
-    grDevices::png(file = file_name, height = plot_height)
+    grDevices::png(file = file_name, height = plot_height, width = plot_width)
   }
   if ("pdf" %in% write) {
-    grDevices::pdf(file = file_name, height = plot_height/72)
+    grDevices::pdf(file = file_name, height = plot_height/72, width = plot_width)
   }
   graphics::par(xpd = NA, mai = c(mai1, mai2, mai3, mai4), omi = c(omi1, omi2, omi3, omi4))
   # plot_chronogram.phylo(chronograms[[i]], cex = 1.5, edge.width = 2, label.offset = 0.5,
