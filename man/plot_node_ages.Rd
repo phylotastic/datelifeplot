@@ -100,7 +100,7 @@ size scaling factor) of tip labels in `chronogram`. Default to value given by `g
 \item{axis_label}{A character string used to provide information on time units. Defaults
 to "Time (MYA)" (time in million years ago). If NULL, time units are not added.}
 
-\item{center_axislabel}{A numeric indicating center position of time axis label. Default to 0.5.}
+\item{center_axislabel}{A numeric indicating centering position of time axis label. Default to 0.5.}
 
 \item{cex_axislabel}{A numeric indicating character expansion for the time axis label. Default to value given by `graphics::par("cex")`.}
 

@@ -310,6 +310,7 @@ utils::globalVariables(c("strat2012"))
 #' 	\item{"strap"}{It uses the function [strap::geoscalePhylo()] from the package [strap].}
 #' 	\item{"phytools"}{Not implemented yet. It will use functions from the package [phytools]}
 #' 	}
+#' @param time_axis Default to `TRUE`, add a time axis to the tree plot.
 #' @param mai1,mai2,mai3,mai4 A numeric value indicating internal plot margin sizes
 #' in inches. `mai4` is particularly important as it indicates the space needed for
 #' plotting whole tip labels on the right margin of the plot.
@@ -325,7 +326,7 @@ utils::globalVariables(c("strat2012"))
 #' @param cex_axislabel A numeric indicating character expansion for the time axis label. Default to value given by `graphics::par("cex")`.
 #' @param pos_title Indicates the line position of the title. Default to 1.
 #' @param pos_axis Indicates the line position of the axis. Default to 1.
-#' @param center_axislabel A numeric indicating center position of time axis label. Default to 0.5.
+#' @param center_axislabel A numeric indicating centering position of time axis label. Default to 0.5.
 #' @param axis_label A character string used to provide information on time units. Defaults
 #' to "Time (MYA)" (time in million years ago). If NULL, time units are not added.
 #' @param cex_tiplabels A numeric value indicating **c**haracter **ex**pansion (i.e.,
@@ -339,6 +340,7 @@ plot_phylo <- function(chronogram,
                        title = "Chronogram",
                        time_depth = NULL,
                        plot_type = "phyloch",
+                       time_axis = TRUE,
                        mai1, mai2, mai3, mai4,
                        omi1, omi2, omi3, omi4,
                        plot_height, plot_width,
@@ -435,18 +437,20 @@ plot_phylo <- function(chronogram,
                     root.edge = TRUE,
                     plot = TRUE, ...)  #
     lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
-    if ("ape" %in% plot_type) {
-      # TODO: fix axis not plotting all the way through the root
-      # See issue https://github.com/phylotastic/datelifeplot/issues/1
-      ape::axisPhylo(side = 1, line = pos_axis, cex.axis = cex_axis)
-      axisChrono(side = 1, unit = NULL, line = pos_axis, cex.axis = cex_axis)
-    } else { # if ("phyloch" %in% plot_type) {
-      axisGeo(GTS = geologic_timescale,
-              unit = geologic_unit,
-              col = c("gray80", "white"),
-              gridcol = c("gray80", "white"),
-              cex = cex_axis,
-              gridty = "twodash")
+    if(time_axis) {
+      if ("ape" %in% plot_type) {
+        # TODO: fix axis not plotting all the way through the root
+        # See issue https://github.com/phylotastic/datelifeplot/issues/1
+        ape::axisPhylo(side = 1, line = pos_axis, cex.axis = cex_axis)
+        axisChrono(side = 1, unit = NULL, line = pos_axis, cex.axis = cex_axis)
+      } else { # if ("phyloch" %in% plot_type) {
+        axisGeo(GTS = geologic_timescale,
+                unit = geologic_unit,
+                col = c("gray80", "white"),
+                gridcol = c("gray80", "white"),
+                cex = cex_axis,
+                gridty = "twodash")
+      }
     }
     # center_axislabel <- 0.5
   }
@@ -471,7 +475,7 @@ plot_phylo <- function(chronogram,
     # center_axislabel <- 1
   }
   # add a label to the axis
-  if (!is.null(units)) {
+  if (time_axis & !is.null(units)) {
     graphics::mtext(axis_label,
                     cex = cex_axislabel,
                     side = 1,

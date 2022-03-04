@@ -112,9 +112,9 @@ plot_node_ages <- function(phy,
     omi4 <- 0
   }
   graphics::par(xpd = NA,
-                mai = c(0, mai2, 0, mai4),
+                mai = c(mai1, mai2, mai3, mai4),
                 # par()$mai[2]
-                omi = c(omi1, 0, 1, 0))
+                omi = c(omi1, omi2, omi3, omi4))
 
   # plot.phylo
   ape::plot.phylo(phy,
@@ -125,11 +125,11 @@ plot_node_ages <- function(phy,
                   plot = FALSE,
                   ...)
   # get plotting x.lim
-  lastPP_x.lim <- get("last_plot.phylo", envir = .PlotPhyloEnv)$x.lim[2]
+  firstPP_x.lim <- get("last_plot.phylo", envir = .PlotPhyloEnv)$x.lim[2]
   ape::plot.phylo(phy,
                   cex = cex_tiplabels, #edge.width = 2,
                   label.offset = 0.5,
-                  x.lim = c(0, lastPP_x.lim),
+                  x.lim = c(0, firstPP_x.lim),
                   root.edge = TRUE,
                   plot = TRUE, ...)
 
@@ -201,7 +201,7 @@ plot_node_ages <- function(phy,
             gridty = "twodash")
   }
   # add a label to the axis
-  if (!is.null(units)) {
+  if (!is.null(axis_label)) {
     graphics::mtext(axis_label,
                     cex = cex_axislabel,
                     side = 1,

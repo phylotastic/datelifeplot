@@ -3,6 +3,7 @@
 export(HPDbars)
 export(axisChrono)
 export(axisGeo)
+export(plot_chronogram)
 export(plot_densitree)
 export(plot_ltt_phyloall)
 export(plot_ltt_summary)
