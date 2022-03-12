@@ -20,7 +20,8 @@ Imports:
     strap,
     graphics,
     gplots,
-    viridis
+    viridis,
+    dplyr
 Suggests:
     knitr,
     testthat (>= 3.0.0)

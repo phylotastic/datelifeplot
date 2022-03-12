@@ -59,7 +59,6 @@ plot_chronogram <- function(chronogram,
                        #pos_axislabel = ,
                        ...){
   #
-  print(time_depth)
   if (!inherits(chronogram, "phylo")) {
       if (inherits(chronogram, "multiPhylo")) {
         message("'chronogram' is a 'multiPhylo' object. Only first chronogram will be plotted.")
@@ -73,6 +72,7 @@ plot_chronogram <- function(chronogram,
     message("'chronogram' has no edge lengths; a geologic time axis can not be plotted.")
     return(NA)
   }
+  # obtain max x lim from chronogram and chronogram + root:
   phylo_length <- max(ape::branching.times(chronogram))
   if (is.null(time_depth)) {
     if (is.null(chronogram$root.edge)) {
@@ -82,12 +82,13 @@ plot_chronogram <- function(chronogram,
     }
   }
   # add a root to the chronogram (or extend the root) to plot from the specified time_depth
-  chronogram$root.edge <- time_depth - max(ape::branching.times(phy))
+  chronogram$root.edge <- time_depth - max(ape::branching.times(chronogram))
   match.arg(arg = plot_type, choices = c("phyloch", "strap", "phytools", "ape"))
   if (is.null(geologic_timescale) | "strat2012" %in% geologic_timescale) {
     utils::data("strat2012", package = "phyloch")
     geologic_timescale <- strat2012
   }
+  # define plotting area margins
   if (missing(mai1)) {
     mai1 <- 0
   }
@@ -121,7 +122,7 @@ plot_chronogram <- function(chronogram,
   if (missing(omi4)) {
     omi4 <- 0
   }
-  graphics::par(xpd = NA,
+  graphics::par(xpd = TRUE,
                 mai = c(mai1, mai2, mai3, mai4),
                 omi = c(omi1, omi2, omi3, omi4))
   # plot_chronogram.phylo(chronograms[[i]], cex = 1.5, edge.width = 2, label.offset = 0.5,

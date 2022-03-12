@@ -145,8 +145,8 @@ size scaling factor) of legend. Default to one half the size of the axis label, 
     \code{"multiPhylo"}.}
     \item{\code{type}}{a character string specifying the type of phylogeny to be
     drawn; it must be one of "phylogram" (the default), "cladogram",
-    "fan", "unrooted", "radial" or any unambiguous abbreviation of
-    these.}
+    "fan", "unrooted", "radial", "tidy", or any unambiguous abbreviation
+    of these.}
     \item{\code{use.edge.length}}{a logical indicating whether to use the edge
     lengths of the phylogeny to draw the branches (the default) or not
     (if \code{FALSE}). This option has no effect if the object of class
