@@ -225,13 +225,20 @@ plot_phylo_all <- function(chronograms,
   for (i in seq(chronograms)) {
     chronograms[[i]]$root.edge <- max_depth - max(ape::branching.times(chronograms[[i]]))
   }
-  if(missing(mai4))
-  mai4 <- unique(unlist(sapply(chronograms, "[", "tip.label")))
-  ind <- which.max(nchar(mai4))
-  mai4 <- graphics::strwidth(s = mai4[ind],
+  ##############################################################################
+  ##############################################################################
+  # Getting mai4 data
+  ##############################################################################
+  ##############################################################################
+  tip_labels <- unique(unlist(sapply(chronograms, "[", "tip.label")))
+  ind <- which.max(nchar(tip_labels))
+  mai4_in <- graphics::strwidth(s = tip_labels[ind],
                              units = "inches",
                              cex = cex_tiplabels,
                              font = 3)
+  if(missing(mai4)) {
+    mai4 <- mai4_in
+  }
   # if(any(lapply(chronograms, ape::Ntip) > 3))
   # png("~/tmp/axisgeo.png", units = "in")
   if (!(write %in% c("png", "pdf"))) {
@@ -394,20 +401,25 @@ plot_phylo <- function(chronogram,
   if (missing(mai3)) {
     mai3 <- 0
   }
+  ind <- which.max(nchar(chronogram$tip.label))
+  mai4_in <- graphics::strwidth(s = chronogram$tip.label[ind],
+                             units = "inches",
+                             cex = cex_tiplabels,
+                             font = 3)
+  message("Recommended 'mai4' is ", mai4_in)
   if (missing(mai4)) {
-    ind <- which.max(nchar(chronogram$tip.label))
-    mai4 <- graphics::strwidth(s = chronogram$tip.label[ind],
-                               units = "inches",
-                               cex = cex_tiplabels,
-                               font = 3)
+    mai4 <- mai4_in
   }
+  message("Used 'mai4' is ", mai4)
   pho <- phylo_height_omi(phy = chronogram)
   message("Recommended plot area height is ", pho$height)
   if (missing(plot_height)) {
     plot_height <- pho$height
   }
+  message("Used plot area height' is ", plot_height)
   if (missing(omi1)) {
     omi1 <- pho$omi1
+    message("Used 'omi1' is ", omi1)
   }
   if (missing(omi2)) {
     omi2 <- 0
@@ -418,12 +430,15 @@ plot_phylo <- function(chronogram,
   if (missing(omi4)) {
     omi4 <- 0
   }
-
+  if (missing(plot_width)) {
+    plot_width <- 500
+  }
+  message("Used plot area width' is ", plot_width)
   if ("png" %in% write) {
     grDevices::png(file = file_name, height = plot_height, width = plot_width)
   }
   if ("pdf" %in% write) {
-    grDevices::pdf(file = file_name, height = plot_height/72, width = plot_width)
+    grDevices::pdf(file = file_name, height = plot_height/72, width = plot_width/72)
   }
   graphics::par(xpd = NA, mai = c(mai1, mai2, mai3, mai4), omi = c(omi1, omi2, omi3, omi4))
   # plot_chronogram.phylo(chronograms[[i]], cex = 1.5, edge.width = 2, label.offset = 0.5,

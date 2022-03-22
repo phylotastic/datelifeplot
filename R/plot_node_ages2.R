@@ -29,6 +29,7 @@
 #'  size scaling factor) of legend. Default to one half the size of the axis label, `cex_axislabel * 0.5`.
 #' @param legend_x the x co-ordinate to be used to position the legend on the left side of the plot.
 #' @param legend_y the y co-ordinate to be used to position the legend on the left side of the plot.
+#' @param legend_box Default to `TRUE`, adds a box around the legend.
 #' @inheritParams plot_phylo
 #' @inheritDotParams ape::plot.phylo
 #' @importFrom ape .PlotPhyloEnv
@@ -64,6 +65,7 @@ plot_node_ages2 <- function(chronogram,
                            legend_cex = cex_axislabel*0.5,
                            legend_x = NULL,
                            legend_y = NULL,
+                           legend_box = TRUE,
                            ...) {
   #
   if (missing(matched_ages)) {
@@ -337,6 +339,8 @@ plot_node_ages2 <- function(chronogram,
            legend = unlist(legend_text),
            pch = legend_pch,
            col = unlist(legend_color),
-           cex = legend_cex)
+           cex = legend_cex,
+           bty = ifelse(legend_box, "o", "n")
+         )
   }
 }

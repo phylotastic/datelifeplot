@@ -39,6 +39,7 @@ plot_node_ages2(
   legend_cex = cex_axislabel * 0.5,
   legend_x = NULL,
   legend_y = NULL,
+  legend_box = TRUE,
   ...
 )
 }
@@ -137,6 +138,8 @@ size scaling factor) of legend. Default to one half the size of the axis label, 
 \item{legend_x}{the x co-ordinate to be used to position the legend on the left side of the plot.}
 
 \item{legend_y}{the y co-ordinate to be used to position the legend on the left side of the plot.}
+
+\item{legend_box}{Default to `TRUE`, adds a box around the legend.}
 
 \item{...}{
   Arguments passed on to \code{\link[ape:plot.phylo]{ape::plot.phylo}}
