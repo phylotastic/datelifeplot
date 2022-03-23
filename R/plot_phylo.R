@@ -89,11 +89,21 @@ plot_phylo <- function(chronogram,
       time_depth <- round(phylo_length + chronogram$root.edge, digits = -1)
     }
   }
+  ############################################################################
+  ############################################################################
+  # define plot type
+  ############################################################################
+  ############################################################################
   match.arg(arg = plot_type, choices = c("phyloch", "strap", "phytools", "ape"))
   if (is.null(geologic_timescale) | "strat2012" %in% geologic_timescale) {
     utils::data("strat2012", package = "phyloch")
     geologic_timescale <- strat2012
   }
+  ############################################################################
+  ############################################################################
+  # define plot area margins
+  ############################################################################
+  ############################################################################
   if (missing(mai1)) {
     mai1 <- 0
   }
@@ -112,7 +122,10 @@ plot_phylo <- function(chronogram,
   if (missing(mai4)) {
     mai4 <- mai4_in
   }
-  message("Used 'mai4' is ", mai4)
+  message("Inner margins applied are mai1 = ", mai1,
+                                    ", mai2 = ", mai2,
+                                    ", mai3 = ", mai3,
+                                    ", mai4 = ", mai4)
   pho <- phylo_height_omi(phy = chronogram)
   message("Recommended plot area height is ", pho$height)
   if (missing(plot_height)) {
@@ -121,7 +134,6 @@ plot_phylo <- function(chronogram,
   message("Used plot area height' is ", plot_height)
   if (missing(omi1)) {
     omi1 <- pho$omi1
-    message("Used 'omi1' is ", omi1)
   }
   if (missing(omi2)) {
     omi2 <- 0
@@ -132,6 +144,10 @@ plot_phylo <- function(chronogram,
   if (missing(omi4)) {
     omi4 <- 0
   }
+  message("Outer margins applied are omi1 = ", omi1,
+                                    ", omi2 = ", omi2,
+                                    ", omi3 = ", omi3,
+                                    ", omi4 = ", omi4)
   if (missing(plot_width)) {
     plot_width <- 500
   }
@@ -142,7 +158,9 @@ plot_phylo <- function(chronogram,
   if ("pdf" %in% write) {
     grDevices::pdf(file = file_name, height = plot_height/72, width = plot_width/72)
   }
-  graphics::par(xpd = NA, mai = c(mai1, mai2, mai3, mai4), omi = c(omi1, omi2, omi3, omi4))
+  graphics::par(xpd = NA,
+    mai = c(mai1, mai2, mai3, mai4),
+    omi = c(omi1, omi2, omi3, omi4))
   # plot_chronogram.phylo(chronograms[[i]], cex = 1.5, edge.width = 2, label.offset = 0.5,
     # x.lim = c(0, max_depth), root.edge = TRUE, root.edge.color = "white")
   # graphics::par(xpd = FALSE)

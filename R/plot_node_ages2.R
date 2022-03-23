@@ -30,6 +30,10 @@
 #' @param legend_x the x co-ordinate to be used to position the legend on the left side of the plot.
 #' @param legend_y the y co-ordinate to be used to position the legend on the left side of the plot.
 #' @param legend_box Default to `TRUE`, adds a box around the legend.
+#' @param legend_pch A numeric vector indicating the symbol to use in legend.
+#'   See [graphics::par()] for options. Defaults to 20 = "bullet circle".
+#' @param legend_text A character vector indicating the text to use as legend.
+#' @param legend_color A character vector indicating the colors to use in legend.
 #' @inheritParams plot_phylo
 #' @inheritDotParams ape::plot.phylo
 #' @importFrom ape .PlotPhyloEnv
@@ -66,6 +70,9 @@ plot_node_ages2 <- function(chronogram,
                            legend_x = NULL,
                            legend_y = NULL,
                            legend_box = TRUE,
+                           legend_pch,
+                           legend_text,
+                           legend_color,
                            ...) {
   #
   if (missing(matched_ages)) {
@@ -171,10 +178,12 @@ plot_node_ages2 <- function(chronogram,
   # plot gray bars
   ############################################################################
   ############################################################################
-  # dplyr::bind_reows only works if class data.frame
+  # dplyr::bind_rows only works if class data.frame, so
+  ## first, convert ages to data.frame
   for (i in seq(in_phy)) {
     class(in_phy[[i]]) <- "data.frame"
   }
+  ## combine the data.frames into a single one:
   combined <- dplyr::bind_rows(in_phy)
   # we use lastPP$xx positions to get plot x position for bar age range
   ages_equal <- combined$MinAge == combined$MaxAge
@@ -210,7 +219,7 @@ plot_node_ages2 <- function(chronogram,
   # plot points
   ############################################################################
   ############################################################################
-  legend_color <- legend_pch <- c()
+  legend_color_in <- legend_pch_in <- c()
   for (matched in names(in_phy)) {
     # we use lastPP$xx positions to get plot x position for node ages
     ages_equal <- in_phy[[matched]]$MinAge == in_phy[[matched]]$MaxAge
@@ -230,18 +239,18 @@ plot_node_ages2 <- function(chronogram,
     # Use study references to color points
     if (missing(pch_color)) {
       color_pch_all <- in_phy[[matched]]$reference
-      print(names(color_pch_all ))
+      print(names(color_pch_all))
     } else {
       mm <- match(as.character(in_phy[[matched]]$reference), names(pch_color[[matched]]))
       color_pch_all <- pch_color[[matched]][mm]
-      print(names(color_pch_all ))
+      print(names(color_pch_all))
     }
     # assign transparency
     if (!is.null(pch_transparency)) {
       color_pch_all <- gplots::col2hex(color_pch_all)
       color_pch_all <- paste0(color_pch_all, pch_transparency)
     }
-    legend_color <- c(legend_color, color_pch_all)
+    legend_color_in <- c(legend_color_in, color_pch_all)
     # plot gray bars:
     for (i in unique(in_phy[[matched]]$mrca_node_number)) {
       rowsies <- in_phy[[matched]]$mrca_node_number == i
@@ -264,13 +273,7 @@ plot_node_ages2 <- function(chronogram,
            pch = pch[[matched]],
            cex = pch_cex)
    xx <- rep(pch[[matched]], length(pch_color[[matched]]))
-   legend_pch <- c(legend_pch, xx)
-}
-  if (add_legend) {
-    legend_text <- unlist(sapply(pch_color, names))
-    if (length(legend_text) == 0) {
-      stop("argument 'pch_color' must have names corresponding to legend.")
-    }
+   legend_pch_in <- c(legend_pch_in, xx)
   }
   ############################################################################
   ############################################################################
@@ -305,7 +308,7 @@ plot_node_ages2 <- function(chronogram,
                     font = 2,
                     line = (omi1-0.2)/0.2,
                     outer = FALSE,
-                    at = max(lastPP$xx) * center_axislabel)# centering of the time axis label
+                    at = max(lastPP$xx) * center_axislabel)  # centering of the time axis label
   }
   ############################################################################
   ############################################################################
@@ -323,22 +326,45 @@ plot_node_ages2 <- function(chronogram,
   ############################################################################
   ############################################################################
   if (add_legend) {
-    legend_x <- ifelse(is.null(legend_x), -time_depth*0.5, legend_x)
-    legend_y <- ifelse(is.null(legend_y), max(y_ages), legend_y)
-
-    if (legend_x <= 0) {
-      graphics::par(xpd=TRUE) # so it's clipped in the outer margin
+    # determine text for legend:
+    if (missing(legend_text)) {
+      legend_text <- unlist(sapply(pch_color, names))
+      if (length(legend_text) == 0) {
+        message("There is no text for legend.\n",
+        "You can provide one in the 'legend_text' argument or as names in 'pch_color' argument.")
+        warning("Legend was not added.")
+        break()
+      }
     }
-    if (legend_y > max(y_ages)) {
-      graphics::par(xpd=NA) # so it's clipped in the upper margin
+    if (inherits(legend_text, "list")) {
+      legend_text <- unlist(legend_text)
+    }
+    # determine legend pch:
+    if (missing(legend_pch)) {
+      legend_pch <- legend_pch_in
+    }
+    # determine legend color:
+    if (missing(legend_color)) {
+      legend_color <- legend_color_in
+    }
+    # determine x and y position of legend:
+    legend_x <- ifelse(is.null(legend_x), -time_depth * 0.5, legend_x)
+    legend_y <- ifelse(is.null(legend_y), max(y_ages), legend_y)
+    # determine xpd par() so legend is not hidden. We have two cases:
+    if (legend_x <= 0) { ## if legend goes in the left margin
+      graphics::par(xpd = TRUE) # xpd = TRUE clips the left margin
+    }
+    if (legend_y > max(y_ages)) { ## if legend goes in the upper margin
+      graphics::par(xpd = NA) # xpd = NA clips the upper margin
     }
     message("Current legend x co-ordinate is set to ", legend_x)
     message("And y co-ordinate is set to ", legend_y)
+    # plot actual legend:
     graphics::legend(x = legend_x,
            y = legend_y,
            legend = unlist(legend_text),
            pch = legend_pch,
-           col = unlist(legend_color),
+           col = legend_color,
            cex = legend_cex,
            bty = ifelse(legend_box, "o", "n")
          )

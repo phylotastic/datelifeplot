@@ -40,6 +40,9 @@ plot_node_ages2(
   legend_x = NULL,
   legend_y = NULL,
   legend_box = TRUE,
+  legend_pch,
+  legend_text,
+  legend_color,
   ...
 )
 }
@@ -140,6 +143,13 @@ size scaling factor) of legend. Default to one half the size of the axis label, 
 \item{legend_y}{the y co-ordinate to be used to position the legend on the left side of the plot.}
 
 \item{legend_box}{Default to `TRUE`, adds a box around the legend.}
+
+\item{legend_pch}{A numeric vector indicating the symbol to use in legend.
+See [graphics::par()] for options. Defaults to 20 = "bullet circle".}
+
+\item{legend_text}{A character vector indicating the text to use as legend.}
+
+\item{legend_color}{A character vector indicating the colors to use in legend.}
 
 \item{...}{
   Arguments passed on to \code{\link[ape:plot.phylo]{ape::plot.phylo}}

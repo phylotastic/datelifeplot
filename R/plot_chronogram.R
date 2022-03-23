@@ -83,12 +83,22 @@ plot_chronogram <- function(chronogram,
   }
   # add a root to the chronogram (or extend the root) to plot from the specified time_depth
   chronogram$root.edge <- time_depth - max(ape::branching.times(chronogram))
+  ############################################################################
+  ############################################################################
+  # define plot type
+  ############################################################################
+  ############################################################################
   match.arg(arg = plot_type, choices = c("phyloch", "strap", "phytools", "ape"))
   if (is.null(geologic_timescale) | "strat2012" %in% geologic_timescale) {
     utils::data("strat2012", package = "phyloch")
     geologic_timescale <- strat2012
   }
-  # define plotting area margins
+  ############################################################################
+  ############################################################################
+  # define plot area margins
+  ############################################################################
+  ############################################################################
+  # inner margins
   if (missing(mai1)) {
     mai1 <- 0
   }
@@ -98,18 +108,30 @@ plot_chronogram <- function(chronogram,
   if (missing(mai3)) {
     mai3 <- 0
   }
+  ind <- which.max(nchar(chronogram$tip.label))
+  mai4_in <- graphics::strwidth(s = chronogram$tip.label[ind],
+                             units = "inches",
+                             cex = cex_tiplabels,
+                             font = 3)
+  message("Recommended 'mai4' is ", mai4_in)
   if (missing(mai4)) {
-    ind <- which.max(nchar(chronogram$tip.label))
-    mai4 <- graphics::strwidth(s = chronogram$tip.label[ind],
-                               units = "inches",
-                               cex = cex_tiplabels,
-                               font = 3)
+    mai4 <- mai4_in
   }
+  message("Inner margins applied are mai1 = ", mai1,
+                                    ", mai2 = ", mai2,
+                                    ", mai3 = ", mai3,
+                                    ", mai4 = ", mai4)
+  # plot height and width:
   pho <- phylo_height_omi(phy = chronogram)
   message("Recommended plot area height is ", pho$height)
   if (missing(plot_height)) {
     plot_height <- pho$height
   }
+  message("Used plot area height' is ", plot_height)
+  if (missing(plot_width)) {
+    plot_width <- 500
+  }
+  # Outer margins
   if (missing(omi1)) {
     omi1 <- pho$omi1
   }
@@ -122,7 +144,11 @@ plot_chronogram <- function(chronogram,
   if (missing(omi4)) {
     omi4 <- 0
   }
-  graphics::par(xpd = TRUE,
+  message("Outer margins applied are omi1 = ", omi1,
+                                     ", omi2 = ", omi2,
+                                     ", omi3 = ", omi3,
+                                     ", omi4 = ", omi4)
+  graphics::par(xpd = NA,
                 mai = c(mai1, mai2, mai3, mai4),
                 omi = c(omi1, omi2, omi3, omi4))
   # plot_chronogram.phylo(chronograms[[i]], cex = 1.5, edge.width = 2, label.offset = 0.5,
