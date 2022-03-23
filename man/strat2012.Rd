@@ -3,7 +3,7 @@
 \docType{data}
 \name{strat2012}
 \alias{strat2012}
-\title{A data frame containing the stratigraphic chart by issued in 2012 by the International Commission on Stratigraphy.}
+\title{A data frame containing the stratigraphic chart issued in 2012 by the International Commission on Stratigraphy.}
 \format{
 A data frame
 \describe{
@@ -24,7 +24,7 @@ A data frame
 strat2012
 }
 \description{
-A data frame containing the stratigraphic chart by issued in 2012 by the International Commission on Stratigraphy.
+A data frame containing the stratigraphic chart issued in 2012 by the International Commission on Stratigraphy.
 }
 \details{
 See phyloch package data description.
