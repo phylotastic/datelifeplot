@@ -34,6 +34,7 @@
 #'   See [graphics::par()] for options. Defaults to 20 = "bullet circle".
 #' @param legend_text A character vector indicating the text to use as legend.
 #' @param legend_color A character vector indicating the colors to use in legend.
+#' @param legend_title A character vector indicating the title to use in legend.
 #' @inheritParams plot_phylo
 #' @inheritDotParams ape::plot.phylo
 #' @importFrom ape .PlotPhyloEnv
@@ -67,19 +68,20 @@ plot_node_ages2 <- function(chronogram,
                            bars_lwd = 7,
                            add_legend = TRUE,
                            legend_cex = cex_axislabel*0.5,
-                           legend_x = NULL,
-                           legend_y = NULL,
+                           legend_x,
+                           legend_y,
                            legend_box = TRUE,
                            legend_pch,
                            legend_text,
                            legend_color,
+                           legend_title,
                            ...) {
   #
   if (missing(matched_ages)) {
     stop("argument 'matched_ages' is missing with no default.")
   }
   # get calibrations that are in_phy only
-  # creates a list of data.frames:
+  # create a list of data.frames:
   in_phy <- lapply(matched_ages, "[[", "in_phy")
   # obtain max x lim from calibration ages, chronogram and chronogram + root:
   phylo_length <- max(ape::branching.times(chronogram))
@@ -219,7 +221,7 @@ plot_node_ages2 <- function(chronogram,
   # plot points
   ############################################################################
   ############################################################################
-  legend_color_in <- legend_pch_in <- c()
+  legend_color_in <- legend_pch_in <- pch_color_in <- vector(mode = "list")
   for (matched in names(in_phy)) {
     # we use lastPP$xx positions to get plot x position for node ages
     ages_equal <- in_phy[[matched]]$MinAge == in_phy[[matched]]$MaxAge
@@ -238,19 +240,20 @@ plot_node_ages2 <- function(chronogram,
     }
     # Use study references to color points
     if (missing(pch_color)) {
+      # choose colors at random
       color_pch_all <- in_phy[[matched]]$reference
-      print(names(color_pch_all))
     } else {
+      # choose colors from pch_color, matching names:
       mm <- match(as.character(in_phy[[matched]]$reference), names(pch_color[[matched]]))
       color_pch_all <- pch_color[[matched]][mm]
-      print(names(color_pch_all))
     }
     # assign transparency
     if (!is.null(pch_transparency)) {
       color_pch_all <- gplots::col2hex(color_pch_all)
       color_pch_all <- paste0(color_pch_all, pch_transparency)
     }
-    legend_color_in <- c(legend_color_in, color_pch_all)
+    pch_color_in <- c(pch_color_in, list(color_pch_all))
+    legend_color_in <- c(legend_color_in, list(color_pch_all))
     # plot gray bars:
     for (i in unique(in_phy[[matched]]$mrca_node_number)) {
       rowsies <- in_phy[[matched]]$mrca_node_number == i
@@ -266,14 +269,15 @@ plot_node_ages2 <- function(chronogram,
                lty = bars_lty,
                lwd = bars_lwd)
     }
-    # plot in_phy ages
+    # plot points of in_phy ages
     graphics::points(x_ages,
            y_ages,
            col = color_pch_all,
            pch = pch[[matched]],
            cex = pch_cex)
+   # get pch symbols for legend:
    xx <- rep(pch[[matched]], length(pch_color[[matched]]))
-   legend_pch_in <- c(legend_pch_in, xx)
+   legend_pch_in <- c(legend_pch_in, list(xx))
   }
   ############################################################################
   ############################################################################
@@ -325,48 +329,64 @@ plot_node_ages2 <- function(chronogram,
   # add a legend
   ############################################################################
   ############################################################################
-  if (add_legend) {
-    # determine text for legend:
-    if (missing(legend_text)) {
-      legend_text <- unlist(sapply(pch_color, names))
-      if (length(legend_text) == 0) {
-        message("There is no text for legend.\n",
-        "You can provide one in the 'legend_text' argument or as names in 'pch_color' argument.")
-        warning("Legend was not added.")
-        break()
+  if (any(add_legend)) {
+    for (i in seq(matched_ages)) {
+      # determine text for legend:
+      if (missing(legend_text)) {
+        legend_text_i <- names(pch_color_in[[i]])
+        if (length(legend_text_i) == 0) {
+          message("There is no text for legend.\n",
+          "You can provide one in the 'legend_text' argument or as names in 'pch_color' argument.")
+          warning("Legend was not added.")
+          break()
+        }
+      } else {
+        legend_text_i <- legend_text[[i]]
       }
+      if (inherits(legend_text_i, "list")) {
+        legend_text_i <- unlist(legend_text_i)
+      }
+      # determine legend cex:
+      legend_cex_i <- ifelse(missing(legend_cex),
+                             cex_axislabel*0.5,
+                             legend_cex[i])
+      # determine legend pch:
+      legend_pch_i <- unlist(ifelse(missing(legend_pch),
+                             legend_pch_in[i],
+                             legend_pch[i]))
+      # determine legend color:
+      legend_color_i <- unlist(ifelse(missing(legend_color),
+                               legend_color_in[i],
+                               legend_color[i]))
+      # determine x and y position of legend:
+      legend_x_i <- ifelse(missing(legend_x),
+                           -time_depth * 0.5,
+                           legend_x[i])
+      legend_y_i <- ifelse(missing(legend_y),
+                           max(y_ages),
+                           legend_y[i])
+      # legend box
+      legend_box_i <- ifelse(legend_box[i], "o", "n")
+      # legend title
+      legend_title_i <- ifelse(missing(legend_title), NULL, legend_title[i])
+      # determine xpd par() so legend is not hidden. We have two cases:
+      if (legend_x_i <= 0) { ## if legend goes in the left margin
+        graphics::par(xpd = TRUE) # xpd = TRUE clips the left margin
+      }
+      if (legend_y_i > max(y_ages)) { ## if legend goes in the upper margin
+        graphics::par(xpd = NA) # xpd = NA clips the upper margin
+      }
+      message("legend ", i, " x co-ordinate is set to ", legend_x_i)
+      message("And ", i, " y co-ordinate is set to ", legend_y_i)
+      # plot actual legend:
+      graphics::legend(x = legend_x_i,
+             y = legend_y_i,
+             legend = legend_text_i,
+             pch = legend_pch_i,
+             col = legend_color_i,
+             cex = legend_cex_i,
+             bty = legend_box_i,
+             title = legend_title_i)
     }
-    if (inherits(legend_text, "list")) {
-      legend_text <- unlist(legend_text)
-    }
-    # determine legend pch:
-    if (missing(legend_pch)) {
-      legend_pch <- legend_pch_in
-    }
-    # determine legend color:
-    if (missing(legend_color)) {
-      legend_color <- legend_color_in
-    }
-    # determine x and y position of legend:
-    legend_x <- ifelse(is.null(legend_x), -time_depth * 0.5, legend_x)
-    legend_y <- ifelse(is.null(legend_y), max(y_ages), legend_y)
-    # determine xpd par() so legend is not hidden. We have two cases:
-    if (legend_x <= 0) { ## if legend goes in the left margin
-      graphics::par(xpd = TRUE) # xpd = TRUE clips the left margin
-    }
-    if (legend_y > max(y_ages)) { ## if legend goes in the upper margin
-      graphics::par(xpd = NA) # xpd = NA clips the upper margin
-    }
-    message("Current legend x co-ordinate is set to ", legend_x)
-    message("And y co-ordinate is set to ", legend_y)
-    # plot actual legend:
-    graphics::legend(x = legend_x,
-           y = legend_y,
-           legend = unlist(legend_text),
-           pch = legend_pch,
-           col = legend_color,
-           cex = legend_cex,
-           bty = ifelse(legend_box, "o", "n")
-         )
   }
 }

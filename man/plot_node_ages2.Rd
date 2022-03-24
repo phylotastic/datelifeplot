@@ -37,12 +37,13 @@ plot_node_ages2(
   bars_lwd = 7,
   add_legend = TRUE,
   legend_cex = cex_axislabel * 0.5,
-  legend_x = NULL,
-  legend_y = NULL,
+  legend_x,
+  legend_y,
   legend_box = TRUE,
   legend_pch,
   legend_text,
   legend_color,
+  legend_title,
   ...
 )
 }
@@ -150,6 +151,8 @@ See [graphics::par()] for options. Defaults to 20 = "bullet circle".}
 \item{legend_text}{A character vector indicating the text to use as legend.}
 
 \item{legend_color}{A character vector indicating the colors to use in legend.}
+
+\item{legend_title}{A character vector indicating the title to use in legend.}
 
 \item{...}{
   Arguments passed on to \code{\link[ape:plot.phylo]{ape::plot.phylo}}
