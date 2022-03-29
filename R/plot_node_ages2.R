@@ -187,8 +187,9 @@ plot_node_ages2 <- function(chronogram,
   if (is.null(names(branching_times))) {
     stop("nodes in chronogram need to be named.")
   } else {
-    message("'chronogram' node names used to extract node numbers are ",
-            names(branching_times))
+    message("'chronogram' node names used to extract node numbers are \n",
+            paste(head(names(branching_times)), collapse = ", "),
+            " ... ", paste(tail(names(branching_times)), collapse = ", "))
   }
   chronogram_node_numbers <- as.numeric(sub("n", "", names(branching_times)))
   # create a chronogram node ages data frame to combine:
