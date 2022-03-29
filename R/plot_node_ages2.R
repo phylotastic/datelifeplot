@@ -180,13 +180,38 @@ plot_node_ages2 <- function(chronogram,
   # plot gray bars
   ############################################################################
   ############################################################################
-  # dplyr::bind_rows only works if class data.frame, so
-  ## first, convert ages to data.frame
+  # sometimes, nodes have only one age point, or ages that do not go over the node
+  # to have gray bars connected to the nodes, we have to include their age in the range
+  # first, get chronogram node ages :
+  branching_times <- ape::branching.times(chronogram)
+  if (is.null(names(branching_times))) {
+    stop("nodes in chronogram need to be named.")
+  } else {
+    message("'chronogram' node names used to extract node numbers are ",
+            names(branching_times))
+  }
+  chronogram_node_numbers <- as.numeric(sub("n", "", names(branching_times)))
+  # create a chronogram node ages data frame to combine:
+  times_data_frame <- data.frame(MRCA = names(branching_times),
+                                 MaxAge = as.numeric(branching_times),
+                                 MinAge = as.numeric(branching_times),
+                                 taxonA = rep("taxonA", length(branching_times)),
+                                 taxonB = rep("taxonB", length(branching_times)),
+                                 reference = rep("chronogram", length(branching_times)),
+                                 mrca_node_number = chronogram_node_numbers,
+                                 mrca_node_name = names(branching_times),
+                                 nodeAge = as.numeric(branching_times))
+  # Combine calibrations and summary ages:
+  # dplyr::bind_rows only works for class data.frame, so convert ages to data.frame:
   for (i in seq(in_phy)) {
     class(in_phy[[i]]) <- "data.frame"
   }
   ## combine the data.frames into a single one:
-  combined <- dplyr::bind_rows(in_phy)
+  combined <- dplyr::bind_rows(c(in_phy, list(times_data_frame)))
+  # homogenize node numbers to be Ntip + 1
+  below_ntip <- combined$mrca_node_number <= lastPP$Ntip
+  fixed <- combined$mrca_node_number[below_ntip] +  lastPP$Ntip
+  combined$mrca_node_number[below_ntip] <- fixed
   # we use lastPP$xx positions to get plot x position for bar age range
   ages_equal <- combined$MinAge == combined$MaxAge
   if (all(ages_equal)) {
@@ -201,6 +226,8 @@ plot_node_ages2 <- function(chronogram,
     # we can directly use mrca_node_numbers as index for lastPP$yy
     # it generates a vector of the correct length
     y_ages <- lastPP$yy[combined$mrca_node_number]
+  } else {
+    stop("There is somethong wrong with mrca node numbers in 'matched_ages'")
   }
   for (i in unique(combined$mrca_node_number)) {
     rowsies <- combined$mrca_node_number == i
