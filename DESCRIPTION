@@ -1,10 +1,10 @@
 Package: datelifeplot
 Type: Package
-Title: Plotting methods for the \code{datelife} R package
+Title: Methods to plot chronograms
 Version: 0.2.2
 Author: c(person("Luna L.", "Sanchez-Reyes", role=c("aut", "cre"), email="lunalsr@gmail.com"),
 Maintainer: "Luna L. Sanchez-Reyes" <lunalsr@gmail.com>
-Description: Generate plots for visualizing results from the DateLife package.
+Description: Generate plots for visualizing results from the datelife package.
     Plot chronograms using the citations as title, overlap chronograms, overlap LTT plots, and more.
 License: GPL (>=2)
 Encoding: UTF-8

@@ -97,7 +97,6 @@ phylo_height_omi <- function(phy){
     omi1 <- 2
   }
   return(list(height = hei, omi1 = omi1))
-
 }
 
 #' Wrap a Character String to a Plotting Area.
