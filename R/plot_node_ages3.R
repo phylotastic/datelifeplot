@@ -4,10 +4,11 @@
 
 #' Plot a Chronogram and Add Age Data to Corresponding Nodes
 #' @description `plot_node_ages` plots a given chronogram and adds age
-#'   data [points()] given in `node_ages` and `summary_ages` to the corresponding nodes.
+#'   data [points()] given in `node_ages`, to the corresponding nodes.
 #'
 #' @param chronogram A `phylo` object with branch length proportional to time.
-#' @param matched_ages An output of [datelife:::summary.matchedCalibrations()] with age data matched to nodes in `chronogram`.
+#' @param node_ages A data.frame, e.g., an output of [datelife:::congruifiedCalibrations()]
+#'    with age data matched to nodes in `chronogram`.
 #' @param pch_color A named vector of colors. Names must correspond to names
 #'  in `matched_ages$in_phy$references`.
 #'  If vector is not named and length > 1, colors will be recycled.
@@ -42,8 +43,8 @@
 #' are overruled within the function. To modify them you have to use the arguments
 #' `mai1`, `mai2`, `mai3` and `mai4`, and omi1, omi2, omi3 and omi4.
 #' @export
-plot_node_ages2 <- function(chronogram,
-                           matched_ages,
+plot_node_ages3 <- function(chronogram,
+                           node_ages,
                            time_depth = NULL,
                            plot_type = "phyloch",
                            mai1, mai2, mai3, mai4,
@@ -78,10 +79,10 @@ plot_node_ages2 <- function(chronogram,
                            ...) {
   #
   if (missing(matched_ages)) {
-    stop("argument 'matched_ages' is missing with no default.")
+    stop("argument 'node_ages' is missing with no default.")
   }
-  # get calibrations that are in_phy only
-  # create a list of data.frames:
+  # check that data.frame has all necessary columns
+  # c("mrca_node_name", "MinAge", "MaxAge", "reference")
   in_phy <- lapply(matched_ages, "[[", "in_phy")
   # obtain max x lim from calibration ages, chronogram and chronogram + root:
   phylo_length <- max(ape::branching.times(chronogram))
@@ -191,9 +192,11 @@ plot_node_ages2 <- function(chronogram,
             paste(head(names(branching_times)), collapse = ", "),
             " ... ", paste(tail(names(branching_times)), collapse = ", "))
   }
+  ############################################################################
+  # add a table of ages to include all nodes in gray bars
   chronogram_node_numbers <- as.numeric(sub("n", "", names(branching_times)))
   # create a chronogram node ages data frame to combine:
-  times_data_frame <- data.frame(MRCA = names(branching_times),
+  chronogram_data_frame <- data.frame(MRCA = names(branching_times),
                                  MaxAge = as.numeric(branching_times),
                                  MinAge = as.numeric(branching_times),
                                  taxonA = rep("taxonA", length(branching_times)),
@@ -207,17 +210,12 @@ plot_node_ages2 <- function(chronogram,
   for (i in seq(in_phy)) {
     class(in_phy[[i]]) <- "data.frame"
   }
-  ############################################################################
   ## combine the data.frames into a single one:
-  combined <- dplyr::bind_rows(c(in_phy, list(times_data_frame)))
-  ############################################################################
+  combined <- dplyr::bind_rows(c(in_phy, list(chronogram_data_frame)))
   # homogenize node numbers to be Ntip + 1
   below_ntip <- combined$mrca_node_number <= lastPP$Ntip
-  if (any(below_ntip)) {
-    fixed <- combined$mrca_node_number[below_ntip] +  lastPP$Ntip
-    combined$mrca_node_number[below_ntip] <- fixed
-  }
-  ############################################################################
+  fixed <- combined$mrca_node_number[below_ntip] +  lastPP$Ntip
+  combined$mrca_node_number[below_ntip] <- fixed
   # we use lastPP$xx positions to get plot x position for bar age range
   ages_equal <- combined$MinAge == combined$MaxAge
   if (all(ages_equal)) {
@@ -228,7 +226,6 @@ plot_node_ages2 <- function(chronogram,
   } else {
     x_ages <- max(lastPP$xx) - combined$nodeAge
   }
-  ############################################################################
   # Next, we use lastPP$yy positions to get plotting y position of nodes
   if (all(combined$mrca_node_number > lastPP$Ntip)) {
     # case in which mrca_node_numbers start at Ntip + 1
@@ -236,11 +233,9 @@ plot_node_ages2 <- function(chronogram,
     # it generates a vector of the correct length
     y_ages <- lastPP$yy[combined$mrca_node_number]
   } else {
-    stop("There is somethong wrong with mrca node numbers in 'node_ages'")
+    stop("There is somethong wrong with mrca node numbers in 'matched_ages'")
   }
-  ############################################################################
-  # plot the gray bars:
-    for (i in unique(combined$mrca_node_number)) {
+  for (i in unique(combined$mrca_node_number)) {
     rowsies <- combined$mrca_node_number == i
     x_min <- min(x_ages[rowsies])
     x_max <- max(x_ages[rowsies])
@@ -260,41 +255,33 @@ plot_node_ages2 <- function(chronogram,
   ############################################################################
   ############################################################################
   legend_color_in <- legend_pch_in <- pch_color_in <- vector(mode = "list")
-  for (data_set in names(in_phy)) {
-    ############################################################################
+  for (matched in names(in_phy)) {
     # we use lastPP$xx positions to get plot x position for node ages
-    ages_equal <- in_phy[[data_set]]$MinAge == in_phy[[data_set]]$MaxAge
+    ages_equal <- in_phy[[matched]]$MinAge == in_phy[[matched]]$MaxAge
     if (all(ages_equal)) {
       # We need the one max x position in lastPP$xx with max(lastPP$xx)
       # Then we substract the node ages to get actual x positions for
       # all node ages on the plot:
-      x_ages <- max(lastPP$xx) - in_phy[[data_set]]$MinAge
+      x_ages <- max(lastPP$xx) - in_phy[[matched]]$MinAge
     } else {
-      x_ages <- max(lastPP$xx) - in_phy[[data_set]]$nodeAge
+      x_ages <- max(lastPP$xx) - in_phy[[matched]]$nodeAge
     }
-    ############################################################################
     # Next, we use lastPP$yy positions to get plotting y position of nodes
-    if (all(in_phy[[data_set]]$mrca_node_number > lastPP$Ntip)) {
+    if (all(in_phy[[matched]]$mrca_node_number > lastPP$Ntip)) {
       # case in which mrca_node_numbers start at Ntip + 1
       # we can directly use mrca_node_numbers as index for lastPP$yy
       # it generates a vector of the correct length
-      y_ages <- lastPP$yy[in_phy[[data_set]]$mrca_node_number]
+      y_ages <- lastPP$yy[in_phy[[matched]]$mrca_node_number]
     }
-    ############################################################################
     # Use study references to color points
     if (missing(pch_color)) {
-      # this chooses colors at random
-      color_pch_all <- in_phy[[data_set]]$reference
+      # choose colors at random
+      color_pch_all <- in_phy[[matched]]$reference
     } else {
-      # choose colors from pch_color, by matching data_set names:
-      mm <- match(as.character(in_phy[[data_set]]$reference), names(pch_color[[data_set]]))
-      if (!is.numeric(mm)) {
-        stop("Something is wrong with pch_color names. Do they match node_ages data sets??")
-      }
-      color_pch_all <- pch_color[[data_set]][mm]
-      #color_pch_all <- pch_color[[data_set]]
+      # choose colors from pch_color, matching names:
+      mm <- match(as.character(in_phy[[matched]]$reference), names(pch_color[[matched]]))
+      color_pch_all <- pch_color[[matched]][mm]
     }
-    ############################################################################
     # assign transparency
     if (!is.null(pch_transparency)) {
       color_pch_all <- gplots::col2hex(color_pch_all)
@@ -302,16 +289,29 @@ plot_node_ages2 <- function(chronogram,
     }
     pch_color_in <- c(pch_color_in, list(color_pch_all))
     legend_color_in <- c(legend_color_in, list(color_pch_all))
-    ############################################################################
-    # plot points from in_phy ages
+    # plot gray bars:
+    for (i in unique(in_phy[[matched]]$mrca_node_number)) {
+      rowsies <- in_phy[[matched]]$mrca_node_number == i
+      x_min <- min(x_ages[rowsies])
+      x_max <- max(x_ages[rowsies])
+      # we just need one element for y position of nodes:
+      y_pos <- y_ages[rowsies][1]
+      graphics::segments(x0 = x_min,
+               y0 = y_pos,
+               x1 = x_max,
+               y1 = y_pos,
+               col = bars_color,
+               lty = bars_lty,
+               lwd = bars_lwd)
+    }
+    # plot points of in_phy ages
     graphics::points(x_ages,
            y_ages,
            col = color_pch_all,
-           pch = pch[[data_set]],
+           pch = pch[[matched]],
            cex = pch_cex)
-   ############################################################################
    # get pch symbols for legend:
-   xx <- rep(pch[[data_set]], length(pch_color[[data_set]]))
+   xx <- rep(pch[[matched]], length(pch_color[[matched]]))
    legend_pch_in <- c(legend_pch_in, list(xx))
   }
   ############################################################################
@@ -356,12 +356,8 @@ plot_node_ages2 <- function(chronogram,
   ############################################################################
   if (!is.null(title)) {
     titlew <- wrap_string_to_plot(string = title, max_cex = cex_title, whole = FALSE)
-    message(titlew)
-    graphics::mtext(text = titlew$wrapped,
-                    outer = TRUE,
-                    cex = titlew$string_cex,
-                    font = titlew$string_font,
-                    line = pos_title)
+    graphics::mtext(text = titlew$wrapped, outer = TRUE,
+      cex = titlew$string_cex, font = titlew$string_font, line = pos_title)
   }
   ############################################################################
   ############################################################################
