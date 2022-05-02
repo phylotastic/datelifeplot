@@ -358,6 +358,31 @@ plot_node_ages2 <- function(chronogram,
   ############################################################################
   ############################################################################
   if (any(add_legend)) {
+    if (missing(legend_title)) {
+      legend_title <- paste("Data set", seq(matched_ages))
+    }
+    if (missing(legend_x)) {
+      legend_x <- -time_depth * 0.5
+    }
+    if (missing(legend_y)) {
+      legend_y <- max(y_ages)
+    }
+    if (length(legend_x) != length(matched_ages)) {
+      legend_x <- rep(legend_x, length(matched_ages))
+    }
+    if (length(legend_y) != length(matched_ages)) {
+      legend_y <- rep(legend_y, length(matched_ages))
+    }
+    if (missing(legend_cex)) {
+      legend_cex <- cex_axislabel * 0.5
+    }
+    if (length(legend_cex) != length(matched_ages)) {
+      legend_cex <- rep(legend_cex, length(matched_ages))
+    }
+    if (length(legend_box) != length(matched_ages)) {
+      legend_box <- rep(legend_box, length(matched_ages))
+    }
+    # add a legend for each data set in matched_ages
     for (i in seq(matched_ages)) {
       # determine text for legend:
       if (missing(legend_text)) {
@@ -375,9 +400,7 @@ plot_node_ages2 <- function(chronogram,
         legend_text_i <- unlist(legend_text_i)
       }
       # determine legend cex:
-      legend_cex_i <- ifelse(missing(legend_cex),
-                             cex_axislabel*0.5,
-                             legend_cex[i])
+      legend_cex_i <- legend_cex[i]
       # determine legend pch:
       legend_pch_i <- unlist(ifelse(missing(legend_pch),
                              legend_pch_in[i],
@@ -387,16 +410,17 @@ plot_node_ages2 <- function(chronogram,
                                legend_color_in[i],
                                legend_color[i]))
       # determine x and y position of legend:
-      legend_x_i <- ifelse(missing(legend_x),
-                           -time_depth * 0.5,
-                           legend_x[i])
-      legend_y_i <- ifelse(missing(legend_y),
-                           max(y_ages),
-                           legend_y[i])
+      legend_x_i <- legend_x[i]
+      legend_y_i <- legend_y[i]
       # legend box
       legend_box_i <- ifelse(legend_box[i], "o", "n")
       # legend title
-      legend_title_i <- ifelse(missing(legend_title), NULL, legend_title[i])
+      legend_title_i <- legend_title[i]
+      # using NULL for "yes" argument of ifelse() errored as follows:
+      # Error in ans[ypos] <- rep(yes, length.out = len)[ypos] :
+      #   replacement has length zero
+      # In addition: Warning message:
+      # In rep(yes, length.out = len) : 'x' is NULL so the result will be NULL
       # determine xpd par() so legend is not hidden. We have two cases:
       if (legend_x_i <= 0) { ## if legend goes in the left margin
         graphics::par(xpd = TRUE) # xpd = TRUE clips the left margin
