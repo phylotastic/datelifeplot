@@ -382,7 +382,9 @@ plot_node_ages2 <- function(chronogram,
     if (length(legend_box) != length(matched_ages)) {
       legend_box <- rep(legend_box, length(matched_ages))
     }
+    ############################################################################
     # add a legend for each data set in matched_ages
+    ############################################################################
     for (i in seq(matched_ages)) {
       # determine text for legend:
       if (missing(legend_text)) {
