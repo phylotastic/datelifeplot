@@ -8,13 +8,13 @@
 #'
 #' @param chronogram A `phylo` object with branch length proportional to time.
 #' @param matched_ages An output of [datelife:::summary.matchedCalibrations()] with age data matched to nodes in `chronogram`.
-#' @param pch_color A named vector of colors. Names must correspond to names
+#' @param pch_color A named vector or list of colors. Names must correspond to names
 #'  in `matched_ages$in_phy$references`.
 #'  If vector is not named and length > 1, colors will be recycled.
 #' @param pch_transparency A numeric value ranging from 10-99, indicating
 #' color transparency for color defined by `pch_color`. Default to `NULL`, no transparency.
-#' @param pch A numeric vector indicating the symbol for calibration age points.
-#'   See [graphics::par()] for options. Defaults to 20 = "bullet circle".
+#' @param pch_type A numeric vector or named list indicating the symbol for calibration age points.
+#'   See [graphics::par()] for symbol options. Defaults to 20 = "bullet circle".
 #' @param pch_cex A numeric value indicating **c**haracter **ex**pansion (i.e.,
 #'  size scaling factor) of symbols defined by `pch`. Default to 1.
 #' @param bars_color A character vector of one element indicating the color for
@@ -59,7 +59,7 @@ plot_node_ages2 <- function(chronogram,
                            axis_label = "Time (MYA)",
                            center_axislabel = 0.5,
                            cex_axislabel = graphics::par("cex"),
-                           pch = 20,
+                           pch_type,
                            pch_color,
                            pch_transparency = NULL,
                            pch_cex = graphics::par("cex"),
@@ -281,7 +281,7 @@ plot_node_ages2 <- function(chronogram,
       y_ages <- lastPP$yy[in_phy[[data_set]]$mrca_node_number]
     }
     ############################################################################
-    # Use study references to color points
+    # Use study references to get vector of color points
     if (missing(pch_color)) {
       # this chooses colors at random
       color_pch_all <- in_phy[[data_set]]$reference
@@ -292,7 +292,19 @@ plot_node_ages2 <- function(chronogram,
         stop("Something is wrong with pch_color names. Do they match node_ages data sets??")
       }
       color_pch_all <- pch_color[[data_set]][mm]
-      #color_pch_all <- pch_color[[data_set]]
+    }
+    ############################################################################
+    # Use study references to get vector point types (pch_type)
+    if (missing(pch_type)) {
+      pch_type_all <- 20
+    } else {
+      # choose point types from pch_type, by matching data_set names:
+      mm <- match(as.character(in_phy[[data_set]]$reference), names(pch_type[[data_set]]))
+      if (!is.numeric(mm)) {
+        stop("Something is wrong with pch_type argument names. Do they match node_ages data sets?? Is it a list?")
+      }
+      pch_type_all <- pch_type[[data_set]][mm]
+#      print(pch_type_all)
     }
     ############################################################################
     # assign transparency
@@ -307,11 +319,11 @@ plot_node_ages2 <- function(chronogram,
     graphics::points(x_ages,
            y_ages,
            col = color_pch_all,
-           pch = pch[[data_set]],
+           pch = pch_type_all,
            cex = pch_cex)
    ############################################################################
    # get pch symbols for legend:
-   xx <- rep(pch[[data_set]], length(pch_color[[data_set]]))
+   xx <- rep(pch_type[[data_set]], length(pch_type[[data_set]]))
    legend_pch_in <- c(legend_pch_in, list(xx))
   }
   ############################################################################

@@ -28,7 +28,7 @@ plot_node_ages2(
   axis_label = "Time (MYA)",
   center_axislabel = 0.5,
   cex_axislabel = graphics::par("cex"),
-  pch = 20,
+  pch_type,
   pch_color,
   pch_transparency = NULL,
   pch_cex = graphics::par("cex"),
@@ -111,10 +111,10 @@ to "Time (MYA)" (time in million years ago). If NULL, time units are not added.}
 
 \item{cex_axislabel}{A numeric indicating character expansion for the time axis label. Default to value given by `graphics::par("cex")`.}
 
-\item{pch}{A numeric vector indicating the symbol for calibration age points.
-See [graphics::par()] for options. Defaults to 20 = "bullet circle".}
+\item{pch_type}{A numeric vector or named list indicating the symbol for calibration age points.
+See [graphics::par()] for symbol options. Defaults to 20 = "bullet circle".}
 
-\item{pch_color}{A named vector of colors. Names must correspond to names
+\item{pch_color}{A named vector or list of colors. Names must correspond to names
 in `matched_ages$in_phy$references`.
 If vector is not named and length > 1, colors will be recycled.}
 
