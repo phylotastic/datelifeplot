@@ -298,13 +298,15 @@ plot_node_ages2 <- function(chronogram,
     if (missing(pch_type)) {
       pch_type_all <- 20
     } else {
+      pch_type_all <- pch_type[[data_set]]
+    }
+    if (length(pch_type_all) > 1) {
       # choose point types from pch_type, by matching data_set names:
       mm <- match(as.character(in_phy[[data_set]]$reference), names(pch_type[[data_set]]))
       if (!is.numeric(mm)) {
         stop("Something is wrong with pch_type argument names. Do they match node_ages data sets?? Is it a list?")
       }
       pch_type_all <- pch_type[[data_set]][mm]
-#      print(pch_type_all)
     }
     ############################################################################
     # assign transparency
@@ -368,7 +370,6 @@ plot_node_ages2 <- function(chronogram,
   ############################################################################
   if (!is.null(title)) {
     titlew <- wrap_string_to_plot(string = title, max_cex = cex_title, whole = FALSE)
-    message(titlew)
     graphics::mtext(text = titlew$wrapped,
                     outer = TRUE,
                     cex = titlew$string_cex,
@@ -430,6 +431,8 @@ plot_node_ages2 <- function(chronogram,
       legend_pch_i <- unlist(ifelse(missing(legend_pch),
                              legend_pch_in[i],
                              legend_pch[i]))
+      message(names(matched_ages)[i], " legend_pch_i:")
+                             print(legend_pch_i)
       # determine legend color:
       legend_color_i <- unlist(ifelse(missing(legend_color),
                                legend_color_in[i],
