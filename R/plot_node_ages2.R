@@ -312,6 +312,19 @@ plot_node_ages2 <- function(chronogram,
       pch_type_all <- pch_type[[data_set]][mm]
     }
     ############################################################################
+    # Use study references to get vector of point cex (pch_cex)
+    if (inherits(pch_cex, "list")) {
+      pch_cex_all <- pch_cex[[data_set]]
+    }
+    if (length(pch_cex_all) > 1) {
+      # choose point types from pch_type, by matching data_set names:
+      mm <- match(as.character(in_phy[[data_set]]$reference), names(pch_cex[[data_set]]))
+      if (!is.numeric(mm)) {
+        stop("Something is wrong with pch_type argument names. Do they match node_ages data sets?? Is it a list?")
+      }
+      pch_cex_all <- pch_cex[[data_set]][mm]
+    }
+    ############################################################################
     # assign transparency
     if (!is.null(pch_transparency)) {
       color_pch_all <- gplots::col2hex(color_pch_all)
@@ -325,7 +338,7 @@ plot_node_ages2 <- function(chronogram,
            y_ages,
            col = color_pch_all,
            pch = pch_type_all,
-           cex = pch_cex)
+           cex = pch_cex_all)
    ############################################################################
    # get pch symbols for legend:
    xx <- rep(pch_type[[data_set]], length(pch_type[[data_set]]))
@@ -435,8 +448,6 @@ plot_node_ages2 <- function(chronogram,
       legend_pch_i <- unlist(ifelse(missing(legend_pch),
                              legend_pch_in[i],
                              legend_pch[i]))
-      message(names(matched_ages)[i], " legend_pch_i:")
-                             print(legend_pch_i)
       # determine legend color:
       legend_color_i <- unlist(ifelse(missing(legend_color),
                                legend_color_in[i],
