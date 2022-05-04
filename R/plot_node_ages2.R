@@ -27,6 +27,8 @@
 #' @param add_legend Default to `TRUE`, adds a legend to the left of the plot.
 #' @param legend_cex A numeric value indicating **c**haracter **ex**pansion (i.e.,
 #'  size scaling factor) of legend. Default to one half the size of the axis label, `cex_axislabel * 0.5`.
+#' @param legend_pt_cex A numeric value indicating **c**haracter **ex**pansion (i.e.,
+#'  character size scaling factor) of legend points. Default to one half the size of the axis label, `cex_axislabel * 0.5`.
 #' @param legend_x the x co-ordinate to be used to position the legend on the left side of the plot.
 #' @param legend_y the y co-ordinate to be used to position the legend on the left side of the plot.
 #' @param legend_box Default to `TRUE`, adds a box around the legend.
@@ -68,6 +70,7 @@ plot_node_ages2 <- function(chronogram,
                            bars_lwd = 7,
                            add_legend = TRUE,
                            legend_cex = cex_axislabel*0.5,
+                           legend_pt_cex = cex_axislabel*0.5,
                            legend_x,
                            legend_y,
                            legend_box = TRUE,
@@ -427,6 +430,7 @@ plot_node_ages2 <- function(chronogram,
       }
       # determine legend cex:
       legend_cex_i <- legend_cex[i]
+      legend_pt_cex_i <- legend_pt_cex[[i]]
       # determine legend pch:
       legend_pch_i <- unlist(ifelse(missing(legend_pch),
                              legend_pch_in[i],
@@ -465,6 +469,7 @@ plot_node_ages2 <- function(chronogram,
              pch = legend_pch_i,
              col = legend_color_i,
              cex = legend_cex_i,
+             pt.cex = legend_pt_cex_i,
              bty = legend_box_i,
              title = legend_title_i)
     }

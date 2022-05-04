@@ -37,6 +37,7 @@ plot_node_ages2(
   bars_lwd = 7,
   add_legend = TRUE,
   legend_cex = cex_axislabel * 0.5,
+  legend_pt_cex = cex_axislabel * 0.5,
   legend_x,
   legend_y,
   legend_box = TRUE,
@@ -138,6 +139,9 @@ See [graphics::par()] for options. Default to 7.}
 
 \item{legend_cex}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
 size scaling factor) of legend. Default to one half the size of the axis label, `cex_axislabel * 0.5`.}
+
+\item{legend_pt_cex}{A numeric value indicating **c**haracter **ex**pansion (i.e.,
+character size scaling factor) of legend points. Default to one half the size of the axis label, `cex_axislabel * 0.5`.}
 
 \item{legend_x}{the x co-ordinate to be used to position the legend on the left side of the plot.}
 
