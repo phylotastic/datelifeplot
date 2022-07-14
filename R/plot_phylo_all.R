@@ -93,15 +93,30 @@ plot_phylo_all <- function(chronograms,
         dir.create(path = gsub("\\.png$|\\.pdf$", "", folder_name))
       }
   }
-  file_prefix <- paste0(folder_name,
-                      "/",
-                      gsub("\\.png$|\\.pdf$", "", file_name),
-                      "_")
-  for (i in seq(chronograms)) {
-    file_name <- paste0(file_prefix,
-                        i,
+
+  if (length(file_name) != length(chronograms)) {
+    file_name <- paste0(folder_name,
+                        "/",
+                        gsub("\\.png$|\\.pdf$", "", file_name),
+                        "_")
+    file_name <- paste0(file_name,
+                        seq(chronograms),
                         ".",
                         write)
+  } else {
+    file_name <- paste0(folder_name,
+                        "/",
+                        gsub("\\.png$|\\.pdf$", "", file_name),
+                        ".",
+                        write)
+  }
+  if (length(plot_height) != length(chronograms)) {
+    plot_height <- rep(plot_height, length(chronograms))
+  }
+  if (length(plot_width) != length(chronograms)) {
+    plot_width <- rep(plot_width, length(chronograms))
+  }
+  for (i in seq(chronograms)) {
     plot_phylo(chronogram = chronograms[[i]],
                title = names(chronograms)[i],
                time_depth = max_depth,
@@ -115,10 +130,10 @@ plot_phylo_all <- function(chronograms,
                omi2 = omi2,
                omi3 = omi3,
                omi4 = omi4,
-               plot_height = plot_height,
-               plot_width = plot_width,
+               plot_height = plot_height[i],
+               plot_width = plot_width[i],
                write = write,
-               file_name = file_name,
+               file_name = file_name[i],
                geologic_timescale = NULL,
                geologic_unit = geologic_unit,
                axis_label = axis_label,

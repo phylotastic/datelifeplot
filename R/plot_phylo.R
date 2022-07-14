@@ -156,6 +156,7 @@ plot_phylo <- function(chronogram,
     grDevices::png(file = file_name, height = plot_height, width = plot_width)
   }
   if ("pdf" %in% write) {
+    print(plot_height)
     grDevices::pdf(file = file_name, height = plot_height/72, width = plot_width/72)
   }
   graphics::par(xpd = NA,
